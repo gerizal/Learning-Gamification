@@ -1,0 +1,8 @@
+# Runtime dependencies (pinned; verified with Python 3.11 on macOS, targets Python 3.11–3.12 on Ubuntu).
+fastapi==0.141.1
+starlette==1.7.0
+pydantic==2.13.5
+uvicorn[standard]==0.54.0
+psycopg[binary,pool]==3.3.6
+psycopg-pool==3.3.3
+python-multipart==0.0.32

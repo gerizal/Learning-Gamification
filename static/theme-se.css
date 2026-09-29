@@ -1,0 +1,750 @@
+/* ==========================================================================
+   theme-se.css — Solve Education brand colours for PlayClass.
+   THE ONLY FILE WITH RAW COLOUR VALUES (plus fonts, radii, spacing, sizes).
+   live.css (home / host / play) and classroom.css reference var(--se-*) only.
+   Load order: theme-se.css → live.css (home / host / play) | classroom.css | reports.css.
+   Part 1 below is the BASE layer that used to live in style.css (retired 2026-09-28 with /practice and
+   the admin page); only the rules the remaining pages can match were kept, in their original order.
+
+   Look: the ORIGINAL PlayClass UI (light, airy, big rounded cards, chunky bottom
+   shadows, Fredoka + Nunito) recoloured with the SE palette. Solid fills only —
+   gradients are banned by the brand. /classroom keeps its dark console layout:
+   the dark values are scoped to body.cr below (charcoal ground); its theme
+   toggle (html[data-theme="light"]) switches it back to the light values.
+
+   Every white-on-fill / ink-on-fill pairing below was checked for WCAG AA
+   (4.5:1 normal text); ratios in the comments. Variable names are stable
+   (a /reports page reuses this file).
+
+   ---------------------------------------------------------------------------
+   Variable → monorepo token (solveeducation/packages/tokens/tokens.json)
+   ---------------------------------------------------------------------------
+   LIGHT (default: home / host / play; classroom with the light toggle)
+   --se-bg            #FAFAFA  color.bg (neutral-50)            page ground, SOLID
+   --se-bg-2          #F5F5F5  color.bg3 (neutral-100)          rows, chips, previews
+   --se-surface       #FFFFFF  color.surface-1                   cards
+   --se-surface-2     #FAFAFA  color.surface-2
+   --se-surface-3     #E5E5E5  color.track                      progress / ring track
+   --se-border        #E5E5E5  color.line
+   --se-border-strong #D4D4D4  color.line-strong
+   --se-ink           #171717  color.charcoal                   text + primary pill buttons
+   --se-text          = --se-ink (light) / #FFFFFF (dark)
+   --se-on-ink        #FFFFFF  color.on-charcoal                (charcoal pill 17.9:1)
+   --se-muted         #525252  color.mut                        (7.8:1 on white, 7.3:1 on bg-2)
+   --se-yellow        #FFCB1D  color.pri       timer ring, PIN highlight, focus, wordmark accent
+   --se-yellow-soft   #FFD84F  color.yellow-soft
+   --se-yellow-press  #E6B317  color.press
+   --se-yellow-ink    #171717  color.on-pri                     (charcoal on yellow 11.9:1)
+   --se-yellow-bg     #FFFBEB  color.pri-lite
+   --se-accent-text   #92400E  color.amber-text                 "yellow" used AS TEXT on light (7.1:1)
+   --se-link          #8E279B  color.purple                     (7.2:1 on white)
+   --se-purple        #8E279B  color.purple / gain-i            teacher card, tile ■ (white 7.2:1)
+   --se-purple-ink    #701F7A  color.purple-ink
+   --se-purple-bg     #FAE8FF  color.purple-bg
+   --se-purple-mid    #BB33CC  color.purple-mid
+   --se-pink          #EC1A64  color.gain-a                     (white only 4.3:1 → fills use pink-ink)
+   --se-pink-ink      #CB1153  color.gain-a-ink                 student card (white 5.6:1)
+   --se-blue          #2397CB  color.gain-g                     (white only 3.3:1 → fills use blue-ink)
+   --se-blue-ink      #1A7299  color.gain-g-ink                 tile ◆ (white 5.4:1)
+   --se-blue-bg       #E0F2FE  color.bluebg      --se-blue-text #0369A1 color.blue2 (5.9:1 on bluebg)
+   --se-red           #EA4134  color.gain-n                     (white only 4.0:1 → fills use red-ink)
+   --se-red-ink       #CB2215  color.gain-n-ink                 tile ▲ (white 5.5:1)
+   --se-green         #10B981  color.green
+   --se-on-fill       #FFFFFF  color.on-charcoal
+   --se-success       #047857  color.success      (white 5.5:1)   --se-success-soft #ECFDF5 color.success-bg
+   --se-success-text  #047857  color.success      (text on white 5.5:1)
+   --se-danger        #BE123C  color.danger       (white 6.0:1)   --se-danger-soft  #FFF1F2 color.danger-bg
+   --se-danger-text   #BE123C  color.danger       --se-danger-border #FFE4E6 color.redbg
+   --se-warn-bg / -border / -text  #FEF3C7 / #FDE68A / #92400E   color.amber-bg / amber-border / amber-text
+   --se-opt-1..4      answer tiles by POSITION (index 0..3; shapes fixed ▲ ◆ ● ■):
+                        opt-1 ▲ red    = red-ink  #CB2215, white    5.5:1
+                        opt-2 ◆ blue   = blue-ink #1A7299, white    5.4:1
+                        opt-3 ● yellow = pri      #FFCB1D, charcoal 11.9:1
+                        opt-4 ■ purple = purple   #8E279B, white    7.2:1
+   --se-opt-N-hi      brand hue for a shape drawn on white/neutral (decorative; text always beside it)
+   --se-teacher / --se-student   gate cards: purple / pink-ink
+   --se-podium-1..3   pri (charcoal text) / color.ink3 #545155 (white 7.6:1) / color.amber-text #92400E (white 7.1:1)
+   --se-team-*        team colours (server keys cyan/pink/lime/amber/violet/orange) → blue2 / gain-a-ink /
+                      success / amber-text / purple / gain-n-ink on light (all ≥ 4.5:1 on white)
+   --se-shadow*, --se-depth, --se-scrim, --se-overlay   charcoal-based rgba (color.overlay-8/12 family)
+   --se-focus         yellow ring + charcoal outer ring (yellow alone is only 1.5:1 on white)
+   --se-plate         #FAF6F1  NOT IN tokens.json: mascot "avatar plate" (matches the .webp background)
+   --se-confetti      pri, gain-g, gain-a, purple, gain-n, green
+
+   DARK (/classroom console, scoped to body.cr)
+   --se-bg            #171717  color.charcoal (neutral-900)
+   --se-bg-2          #19161A  color.ink
+   --se-surface       #262626  color.charcoal-hover (neutral-800)
+   --se-surface-2     #282529  color.ink2
+   --se-surface-3     #3A3A3A  NOT IN tokens.json (neutral-700 step): add or map to color.ink3 when porting
+   --se-border        #404040  NOT IN tokens.json (neutral-700): add or map to color.ink3 when porting
+   --se-border-strong #545155  color.ink3
+   --se-text          #FFFFFF  color.on-charcoal
+   --se-muted         #D4D4D4  color.on-ink-mut   (11:1 on surface)
+   --se-accent-text   #FFCB1D  color.pri          (yellow text on charcoal 11.9:1)
+   --se-link          #FFD84F  color.yellow-soft
+   --se-success-text  #10B981  color.green        (6.0:1 on surface)
+   --se-danger-text   #FDA4AF  NOT IN tokens.json (rose-300 tint of color.red, 8:1 on surface)
+   --se-*-soft/-bg    brand hue at 14–16 % alpha  NOT IN tokens.json (dark tints of success-bg / danger-bg / pri-lite)
+   --se-team-*        bright brand hues: gain-g / gain-a / green / pri / purple-mid / gain-n
+                      (team names are ≥ 18.66px bold = large text; lowest is purple-mid 3.2:1 ≥ 3:1)
+
+   TYPE — the owner kept the original faces (not the monorepo's font.family.display/body):
+   --se-font-display  "Fredoka"  NOT IN tokens.json (map to font.family.display "Plus Jakarta Sans" when porting)
+   --se-font-body     "Nunito"   NOT IN tokens.json (map to font.family.body "Open Sans" when porting)
+   --se-w-*           font.weight.regular / semibold / bold / extrabold
+
+   SHAPE / SPACE / MOTION
+   --se-radius-sm 8px radius.8 · --se-radius-btn 14px radius.14 · --se-radius 16px (NOT IN; radius.16 = 14px)
+   --se-radius-lg 18px, --se-radius-xl 26px, --se-radius-2xl 28px (NOT IN; the original card radii)
+   --se-radius-pill radius.full · --se-space-1..10 spacing.xs … 6xl · --se-tap spacing.tap
+   --se-col-narrow 560px breakpoint.sm · --se-content-max 1100px (NOT IN; breakpoint.content-max = 1180)
+   --se-avatar-*, --se-logo-h, --se-icon  component sizes (NOT IN tokens.json)
+   --se-dur / --se-ease  effect.motion.duration.base / effect.motion.ease.standard
+   ========================================================================== */
+
+/* ==========================================================================
+   PART 1 — BASE (moved from the retired static/style.css, 2026-09-28)
+   Generic tokens (--bg, --text, --accent, --radius, …), reset, layout helpers, buttons, cards, forms,
+   badges, toasts and the .theme-console arcade look used by /classroom. Kept in the original order and
+   BEFORE the SE brand layer so the cascade is unchanged. Every selector is scoped with
+   :where(:root:not(.rp-root)) — zero specificity — so /reports (<html class="rp-root">), which never loaded
+   style.css, renders exactly as before.
+   ========================================================================== */
+
+:root:where(:not(.rp-root)) {
+  color-scheme: light dark;
+
+  /* palette — light */
+  --bg: #f6f7fb;
+  --surface: #ffffff;
+  --surface-2: #eef0f7;
+  --surface-3: #e2e6f1;
+  --text: #1b1f2e;
+  --text-muted: #5b6275;
+  --border: #d9dde8;
+  --accent: #5b4fe0;          /* single accent colour (violet) */
+  --accent-hover: #4a3fcc;
+  --accent-soft: #ebe9fd;
+  --on-accent: #ffffff;
+
+  --success: #1d8a4e;
+  --success-soft: #dcf5e6;
+  --warning: #a86200;
+  --warning-soft: #fff0d6;
+  --danger: #c62f3b;
+  --danger-soft: #fde2e4;
+  --info: #1f6fb8;
+  --info-soft: #dcecfb;
+  --star: #f2a900;
+
+  /* shape / type / motion */
+  --radius-sm: 8px;
+  --radius: 14px;
+  --radius-lg: 22px;
+  --radius-pill: 999px;
+  --shadow-sm: 0 1px 2px rgba(20, 24, 40, 0.06);
+  --shadow: 0 2px 6px rgba(20, 24, 40, 0.06), 0 8px 24px rgba(20, 24, 40, 0.06);
+  --focus-ring: 0 0 0 3px var(--bg), 0 0 0 6px var(--accent);
+  --font: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", "Helvetica Neue", Arial, sans-serif,
+    "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji";
+  --font-display: var(--font);
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --dur: 180ms;
+  --tap: 48px; /* minimum touch target */
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]):where(:not(.rp-root)) {
+    --bg: #11131b;
+    --surface: #1a1d28;
+    --surface-2: #232736;
+    --surface-3: #2d3244;
+    --text: #eceef5;
+    --text-muted: #a2a8ba;
+    --border: #333a4e;
+    --accent: #9d93ff;
+    --accent-hover: #b3abff;
+    --accent-soft: #2b2856;
+    --on-accent: #14122e;
+    --success: #5fd394;
+    --success-soft: #173826;
+    --warning: #f3b64d;
+    --warning-soft: #3d2c10;
+    --danger: #ff7c86;
+    --danger-soft: #45191e;
+    --info: #74b6f5;
+    --info-soft: #152d45;
+    --star: #ffc93c;
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+    --shadow: 0 2px 6px rgba(0, 0, 0, 0.25), 0 8px 24px rgba(0, 0, 0, 0.25);
+  }
+}
+:root[data-theme="dark"]:where(:not(.rp-root)) {
+  --bg: #11131b;
+  --surface: #1a1d28;
+  --surface-2: #232736;
+  --surface-3: #2d3244;
+  --text: #eceef5;
+  --text-muted: #a2a8ba;
+  --border: #333a4e;
+  --accent: #9d93ff;
+  --accent-hover: #b3abff;
+  --accent-soft: #2b2856;
+  --on-accent: #14122e;
+  --success: #5fd394;
+  --success-soft: #173826;
+  --warning: #f3b64d;
+  --warning-soft: #3d2c10;
+  --danger: #ff7c86;
+  --danger-soft: #45191e;
+  --info: #74b6f5;
+  --info-soft: #152d45;
+  --star: #ffc93c;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow: 0 2px 6px rgba(0, 0, 0, 0.25), 0 8px 24px rgba(0, 0, 0, 0.25);
+}
+
+/* ---------- base ---------- */
+:root:where(:not(.rp-root)), :where(:root:not(.rp-root)) *, :where(:root:not(.rp-root)) *::before, :where(:root:not(.rp-root)) *::after { box-sizing: border-box; }
+html:where(:not(.rp-root)) { -webkit-text-size-adjust: 100%; }
+:where(:root:not(.rp-root)) body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+:where(:root:not(.rp-root)) h1, :where(:root:not(.rp-root)) h2, :where(:root:not(.rp-root)) h3, :where(:root:not(.rp-root)) h4 { line-height: 1.25; margin: 0 0 0.5em; }
+:where(:root:not(.rp-root)) h1 { font-size: 1.6rem; }
+:where(:root:not(.rp-root)) h2 { font-size: 1.3rem; }
+:where(:root:not(.rp-root)) h3 { font-size: 1.08rem; }
+:where(:root:not(.rp-root)) p { margin: 0 0 0.75em; }
+:where(:root:not(.rp-root)) a { color: var(--accent); }
+:where(:root:not(.rp-root)) img { max-width: 100%; display: block; }
+:where(:root:not(.rp-root)) :focus { outline: none; }
+:where(:root:not(.rp-root)) :focus-visible { outline: none; box-shadow: var(--focus-ring); border-radius: var(--radius-sm); }
+:where(:root:not(.rp-root)) ::selection { background: var(--accent-soft); }
+:where(:root:not(.rp-root)) .sr-only {
+  position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+:where(:root:not(.rp-root)) .skip-link { position: absolute; left: 8px; top: -60px; z-index: 100; }
+:where(:root:not(.rp-root)) .skip-link:focus { top: 8px; }
+
+/* ---------- layout helpers ---------- */
+:where(:root:not(.rp-root)) .container { width: 100%; max-width: 720px; margin: 0 auto; padding: 16px; }
+:where(:root:not(.rp-root)) .stack { display: flex; flex-direction: column; gap: 16px; }
+:where(:root:not(.rp-root)) .row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+:where(:root:not(.rp-root)) .grow { flex: 1 1 auto; min-width: 0; }
+:where(:root:not(.rp-root)) .center { text-align: center; }
+:where(:root:not(.rp-root)) .muted { color: var(--text-muted); }
+:where(:root:not(.rp-root)) .small { font-size: 0.875rem; }
+:where(:root:not(.rp-root)) .hidden, :where(:root:not(.rp-root)) [hidden] { display: none !important; }
+:where(:root:not(.rp-root)) .topbar-title { font-weight: 800; font-size: 1.1rem; display: flex; align-items: center; gap: 8px; }
+
+/* ---------- buttons ---------- */
+:where(:root:not(.rp-root)) .btn {
+  -webkit-appearance: none; appearance: none;
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: var(--tap); padding: 10px 18px;
+  font: inherit; font-weight: 650; line-height: 1.2; text-decoration: none;
+  color: var(--text); background: var(--surface-2);
+  border: 1px solid var(--border); border-radius: var(--radius);
+  cursor: pointer; user-select: none; touch-action: manipulation;
+  transition: background var(--dur) var(--ease), transform var(--dur) var(--ease), border-color var(--dur) var(--ease);
+}
+:where(:root:not(.rp-root)) .btn:hover { background: var(--surface-3); }
+:where(:root:not(.rp-root)) .btn:active { transform: scale(0.97); }
+:where(:root:not(.rp-root)) .btn:focus-visible { box-shadow: var(--focus-ring); border-radius: var(--radius); }
+:where(:root:not(.rp-root)) .btn[disabled], :where(:root:not(.rp-root)) .btn[aria-disabled="true"] { opacity: 0.5; cursor: not-allowed; transform: none; }
+:where(:root:not(.rp-root)) .btn-primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+:where(:root:not(.rp-root)) .btn-primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+:where(:root:not(.rp-root)) .btn-ghost { background: transparent; border-color: transparent; }
+:where(:root:not(.rp-root)) .btn-ghost:hover { background: var(--surface-2); }
+:where(:root:not(.rp-root)) .btn-sm { min-height: 36px; padding: 6px 12px; font-size: 0.9rem; border-radius: var(--radius-sm); }
+:where(:root:not(.rp-root)) .btn-lg { min-height: 56px; padding: 14px 24px; font-size: 1.1rem; }
+:where(:root:not(.rp-root)) .btn-icon { width: var(--tap); padding: 0; }
+
+/* ---------- cards ---------- */
+:where(:root:not(.rp-root)) .card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); box-shadow: var(--shadow-sm);
+  padding: 16px;
+}
+
+/* ---------- forms ---------- */
+:where(:root:not(.rp-root)) .field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+:where(:root:not(.rp-root)) .field > label, :where(:root:not(.rp-root)) .field-label { font-weight: 650; font-size: 0.92rem; }
+:where(:root:not(.rp-root)) .field .hint { font-size: 0.82rem; color: var(--text-muted); }
+:where(:root:not(.rp-root)) .field .error { font-size: 0.82rem; color: var(--danger); }
+:where(:root:not(.rp-root)) .input, :where(:root:not(.rp-root)) .select, :where(:root:not(.rp-root)) .textarea, :where(:root:not(.rp-root)) .field input:not([type="checkbox"]):not([type="radio"]), :where(:root:not(.rp-root)) .field select, :where(:root:not(.rp-root)) .field textarea {
+  width: 100%; min-height: var(--tap);
+  padding: 10px 14px; font: inherit; color: var(--text);
+  background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius);
+  transition: border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+}
+:where(:root:not(.rp-root)) .textarea, :where(:root:not(.rp-root)) .field textarea { min-height: 96px; resize: vertical; }
+:where(:root:not(.rp-root)) .input:focus, :where(:root:not(.rp-root)) .select:focus, :where(:root:not(.rp-root)) .textarea:focus, :where(:root:not(.rp-root)) .field input:focus, :where(:root:not(.rp-root)) .field select:focus, :where(:root:not(.rp-root)) .field textarea:focus {
+  border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); outline: none;
+}
+:where(:root:not(.rp-root)) [aria-invalid="true"] { border-color: var(--danger) !important; }
+:where(:root:not(.rp-root)) .checkbox { display: inline-flex; align-items: center; gap: 10px; min-height: var(--tap); cursor: pointer; }
+:where(:root:not(.rp-root)) .checkbox input { width: 20px; height: 20px; accent-color: var(--accent); }
+
+/* ---------- tables ---------- */
+:where(:root:not(.rp-root)) .table-wrap { width: 100%; overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); }
+:where(:root:not(.rp-root)) .table { width: 100%; border-collapse: collapse; font-size: 0.93rem; }
+:where(:root:not(.rp-root)) .table th, :where(:root:not(.rp-root)) .table td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border); vertical-align: middle; }
+:where(:root:not(.rp-root)) .table th { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); background: var(--surface-2); font-weight: 700; }
+:where(:root:not(.rp-root)) .table tr:last-child td { border-bottom: 0; }
+:where(:root:not(.rp-root)) .table tbody tr:hover { background: var(--surface-2); }
+:where(:root:not(.rp-root)) .table .num { text-align: right; font-variant-numeric: tabular-nums; }
+:where(:root:not(.rp-root)) .table tr.is-me, :where(:root:not(.rp-root)) .table tr[aria-current="true"] { background: var(--accent-soft); font-weight: 650; }
+
+/* ---------- badges & chips ---------- */
+:where(:root:not(.rp-root)) .badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 2px 10px; min-height: 24px;
+  font-size: 0.78rem; font-weight: 700; line-height: 1.2; white-space: nowrap;
+  border-radius: var(--radius-pill); background: var(--surface-2); color: var(--text-muted);
+}
+:where(:root:not(.rp-root)) .chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 12px; min-height: 34px;
+  font-weight: 650; font-size: 0.92rem;
+  border-radius: var(--radius-pill); border: 1.5px solid var(--border); background: var(--surface);
+}
+
+/* ---------- progress ---------- */
+:where(:root:not(.rp-root)) .progress { position: relative; height: 12px; border-radius: var(--radius-pill); background: var(--surface-3); overflow: hidden; }
+
+/* ---------- toast ---------- */
+:where(:root:not(.rp-root)) .toast-region {
+  position: fixed; z-index: 1000; left: 50%; bottom: 16px; transform: translateX(-50%);
+  width: min(560px, calc(100vw - 32px));
+  display: flex; flex-direction: column; gap: 8px; pointer-events: none;
+}
+:where(:root:not(.rp-root)) .toast {
+  pointer-events: auto;
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 12px 14px; border-radius: var(--radius);
+  background: var(--text); color: var(--bg);
+  box-shadow: var(--shadow); font-weight: 550;
+  animation: toast-in 220ms var(--ease);
+}
+:where(:root:not(.rp-root)) .toast .toast-msg { flex: 1; }
+:where(:root:not(.rp-root)) .toast .toast-close { background: none; border: 0; color: inherit; font: inherit; font-size: 1.2rem; line-height: 1; cursor: pointer; padding: 0 4px; min-width: 44px; min-height: 44px; }
+:where(:root:not(.rp-root)) .toast-error { background: var(--danger); color: #fff; }
+:where(:root:not(.rp-root)) .toast-success { background: var(--success); color: #fff; }
+@keyframes toast-in { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+
+/* ---------- misc ---------- */
+:where(:root:not(.rp-root)) .spinner {
+  display: inline-block; width: 22px; height: 22px;
+  border: 3px solid var(--surface-3); border-top-color: var(--accent); border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+:where(:root:not(.rp-root)) .spinner-lg { width: 44px; height: 44px; border-width: 4px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+:where(:root:not(.rp-root)) .empty { padding: 20px; text-align: center; color: var(--text-muted); }
+:where(:root:not(.rp-root)) .banner { padding: 12px 14px; border-radius: var(--radius); background: var(--info-soft); color: var(--info); font-weight: 550; }
+:where(:root:not(.rp-root)) .banner-warning { background: var(--warning-soft); color: var(--warning); }
+:where(:root:not(.rp-root)) .banner-danger { background: var(--danger-soft); color: var(--danger); }
+:where(:root:not(.rp-root)) .kbd { font-family: var(--font-mono); font-size: 0.8em; padding: 1px 6px; border: 1px solid var(--border); border-bottom-width: 2px; border-radius: 6px; background: var(--surface-2); }
+
+/* ==========================================================================
+   LEARNER GAME — "console" theme. Scoped to body.theme-console.
+   Dark-first; light variant via <html data-theme="light">.
+   ========================================================================== */
+:where(:root:not(.rp-root)) .theme-console {
+  --bg: #0b0a1a;
+  --surface: #16142e;
+  --surface-2: #211e42;
+  --surface-3: #2f2a5c;
+  --text: #f3f1ff;
+  --text-muted: #b6b0e2;
+  --border: #3a347c;
+  --accent: #a78bfa;
+  --accent-hover: #c4b5fd;
+  --accent-soft: #2a2362;
+  --on-accent: #ffffff;
+  --success: #4ade80;
+  --success-soft: #0f3324;
+  --warning: #fbbf24;
+  --warning-soft: #3b2a07;
+  --danger: #fb7185;
+  --danger-soft: #3f1320;
+  --info: #38bdf8;
+  --info-soft: #0c2c44;
+  --star: #ffd23f;
+  --grad: linear-gradient(135deg, #7c3aed 0%, #c026d3 55%, #db2777 100%);
+  --grad-cool: linear-gradient(90deg, #22d3ee, #a78bfa, #f472b6);
+  --glow: 0 0 24px rgba(167, 139, 250, 0.45);
+  --btn-depth: #07061a;
+  --grid-line: rgba(167, 139, 250, 0.07);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+  --focus-ring: 0 0 0 3px var(--bg), 0 0 0 6px #22d3ee;
+  --font-display: "Fredoka", "Baloo 2", "Nunito", var(--font);
+  --font: "Nunito", system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", Arial, sans-serif,
+    "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji";
+  color-scheme: dark;
+}
+:root[data-theme="light"]:where(:not(.rp-root)) .theme-console {
+  --bg: #f4f2ff;
+  --surface: #ffffff;
+  --surface-2: #efebff;
+  --surface-3: #ddd6fe;
+  --text: #1a1433;
+  --text-muted: #51487a;
+  --border: #d4ccf5;
+  --accent: #6d28d9;
+  --accent-hover: #5b21b6;
+  --accent-soft: #ede9fe;
+  --success: #166534;
+  --success-soft: #dcfce7;
+  --warning: #92400e;
+  --warning-soft: #fef3c7;
+  --danger: #be123c;
+  --danger-soft: #ffe4e6;
+  --info: #0369a1;
+  --info-soft: #e0f2fe;
+  --star: #f59e0b;
+  --glow: 0 0 20px rgba(109, 40, 217, 0.22);
+  --btn-depth: #c9bff0;
+  --grid-line: rgba(109, 40, 217, 0.06);
+  --shadow-sm: 0 1px 2px rgba(40, 20, 90, 0.08);
+  --shadow: 0 10px 30px rgba(40, 20, 90, 0.12);
+  --focus-ring: 0 0 0 3px var(--bg), 0 0 0 6px #6d28d9;
+  color-scheme: light;
+}
+
+:where(:root:not(.rp-root)) body.theme-console {
+  font-family: var(--font);
+  background-color: var(--bg);
+  background-image:
+    radial-gradient(900px 500px at 10% -10%, rgba(124, 58, 237, 0.28), transparent 60%),
+    radial-gradient(700px 500px at 110% 10%, rgba(219, 39, 119, 0.18), transparent 60%),
+    radial-gradient(600px 400px at 50% 120%, rgba(34, 211, 238, 0.14), transparent 60%),
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: auto, auto, auto, 32px 32px, 32px 32px;
+  background-attachment: fixed;
+}
+:where(:root:not(.rp-root)) .theme-console h1, :where(:root:not(.rp-root)) .theme-console h2, :where(:root:not(.rp-root)) .theme-console h3, :where(:root:not(.rp-root)) .theme-console .display { font-family: var(--font-display); font-weight: 600; letter-spacing: 0.01em; }
+:where(:root:not(.rp-root)) .theme-console .topbar-title { font-family: var(--font-display); font-weight: 700; font-size: 1.25rem; }
+:where(:root:not(.rp-root)) .theme-console .card { border-radius: var(--radius-lg); background: color-mix(in srgb, var(--surface) 92%, transparent); }
+
+/* arcade buttons: chunky with a "depth" edge */
+:where(:root:not(.rp-root)) .theme-console .btn { font-family: var(--font-display); font-weight: 600; letter-spacing: 0.02em; box-shadow: 0 4px 0 var(--btn-depth); }
+:where(:root:not(.rp-root)) .theme-console .btn:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--btn-depth); }
+:where(:root:not(.rp-root)) .theme-console .btn:focus-visible { box-shadow: 0 4px 0 var(--btn-depth), var(--focus-ring); }
+:where(:root:not(.rp-root)) .theme-console .btn-primary { background: var(--grad); border-color: transparent; color: #fff; text-shadow: 0 1px 1px rgba(0, 0, 0, 0.25); }
+:where(:root:not(.rp-root)) .theme-console .btn-primary:hover { background: var(--grad); filter: brightness(1.1) saturate(1.1); }
+:where(:root:not(.rp-root)) .theme-console .btn-ghost { box-shadow: none; }
+:where(:root:not(.rp-root)) .theme-console .btn-ghost:active { box-shadow: none; }
+:where(:root:not(.rp-root)) .theme-console .btn-icon { font-size: 1.2rem; }
+
+/* ---------- onboarding / how-to dialog ---------- */
+:where(:root:not(.rp-root)) .howto {
+  width: min(440px, calc(100vw - 32px)); padding: 0; border: 0; border-radius: var(--radius-lg);
+  background: var(--surface); color: var(--text); box-shadow: var(--shadow), var(--glow);
+}
+:where(:root:not(.rp-root)) .howto::backdrop { background: rgba(5, 3, 20, 0.72); backdrop-filter: blur(3px); }
+:where(:root:not(.rp-root)) .howto-inner { padding: 24px 20px 20px; text-align: center; display: flex; flex-direction: column; gap: 12px; }
+@keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+
+
+/* ---------- player HUD ---------- */
+:where(:root:not(.rp-root)) .stat { background: var(--surface-2); border-radius: var(--radius); padding: 10px 6px; text-align: center; }
+
+
+/* ---------- lists (leaderboard / recent) ---------- */
+:where(:root:not(.rp-root)) .lb-rank { width: 30px; text-align: center; font-family: var(--font-display); font-weight: 600; color: var(--text-muted); font-variant-numeric: tabular-nums; font-size: 1.05rem; }
+
+/* ---------- gameplay HUD ---------- */
+@keyframes bump { 40% { transform: scale(1.3); color: var(--star); } } /* ✓ / ✗ glyph + shape, not colour-only (A11Y-22) */
+
+:where(:root:not(.rp-root)) .combo { --heat: 0; display: flex; align-items: center; gap: 8px; min-width: 0; }
+@keyframes flicker { to { transform: scale(calc(0.95 + var(--heat) * 0.35)) rotate(4deg); } }
+
+/* mic orb + timer ring */
+:where(:root:not(.rp-root)) .timer-ring { position: absolute; inset: 0; transform: rotate(-90deg); overflow: visible; }
+:where(:root:not(.rp-root)) .timer-ring circle { fill: none; stroke-width: 8; }
+:where(:root:not(.rp-root)) .timer-ring .ring-bg { stroke: var(--surface-3); }
+:where(:root:not(.rp-root)) .timer-ring .ring-fg { stroke: var(--ring, #22d3ee); stroke-linecap: round; filter: drop-shadow(0 0 6px rgba(34, 211, 238, 0.7)); transition: stroke 300ms; }
+:where(:root:not(.rp-root)) .timer-ring.is-low .ring-fg { stroke: #fb7185; filter: drop-shadow(0 0 6px rgba(251, 113, 133, 0.8)); }
+:where(:root:not(.rp-root)) .timer-text { font-family: var(--font-display); font-weight: 600; font-variant-numeric: tabular-nums; font-size: 1.3rem; }
+:where(:root:not(.rp-root)) .timer-text.is-low { color: var(--danger); }
+:where(:root:not(.rp-root)) .rec-status { min-height: 1.5em; font-weight: 700; color: var(--text-muted); max-width: 32ch; }
+:where(:root:not(.rp-root)) .judging { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 6px 0; font-family: var(--font-display); font-weight: 600; font-size: 1.2rem; }
+
+/* ---------- result juice ---------- */
+:where(:root:not(.rp-root)) .stars { display: flex; justify-content: center; gap: 10px; font-size: 3.4rem; line-height: 1; margin: 4px 0 4px; }
+:where(:root:not(.rp-root)) .star { color: transparent; -webkit-text-stroke: 2px var(--text-muted); opacity: 1; } /* unearned: visible outline (A11Y-22) */
+:where(:root:not(.rp-root)) .star.is-on { color: var(--star); -webkit-text-stroke: 0; opacity: 1; text-shadow: 0 0 18px color-mix(in srgb, var(--star) 70%, transparent); animation: star-pop 520ms var(--ease) both; }
+:where(:root:not(.rp-root)) .star.is-on:nth-child(1) { animation-delay: 100ms; }
+:where(:root:not(.rp-root)) .star.is-on:nth-child(2) { animation-delay: 380ms; font-size: 1.2em; }
+:where(:root:not(.rp-root)) .star.is-on:nth-child(3) { animation-delay: 660ms; }
+:where(:root:not(.rp-root)) .star:nth-child(2) { transform: translateY(-8px); }
+@keyframes star-pop { 0% { transform: scale(0) rotate(-40deg); opacity: 0; } 65% { transform: scale(1.35) rotate(10deg); opacity: 1; } 100% { transform: scale(1) rotate(0); } }
+:where(:root:not(.rp-root)) .star.is-on:nth-child(2) { animation-name: star-pop-mid; }
+@keyframes star-pop-mid { 0% { transform: translateY(-8px) scale(0) rotate(-40deg); opacity: 0; } 65% { transform: translateY(-8px) scale(1.35) rotate(10deg); opacity: 1; } 100% { transform: translateY(-8px) scale(1); } }
+:where(:root:not(.rp-root)) .combo-banner {
+  align-self: center; font-family: var(--font-display); font-weight: 700; font-size: 1.35rem; letter-spacing: 0.04em;
+  padding: 6px 18px; color: #fff; background: linear-gradient(90deg, #f97316, #ef4444, #db2777);
+  transform: skewX(-10deg); border-radius: 8px; box-shadow: 0 0 22px rgba(239, 68, 68, 0.5);
+  animation: slam 520ms var(--ease) 700ms both;
+}
+:where(:root:not(.rp-root)) .combo-banner > span { display: inline-block; transform: skewX(10deg); }
+@keyframes slam { 0% { transform: skewX(-10deg) scale(2.2); opacity: 0; } 60% { transform: skewX(-10deg) scale(0.92); opacity: 1; } 100% { transform: skewX(-10deg) scale(1); } }
+:where(:root:not(.rp-root)) .speed-badge {
+  display: inline-flex; align-items: center; gap: 4px; padding: 5px 12px; border-radius: 99px;
+  font-family: var(--font-display); font-weight: 700; color: #0b0a1a; background: #fde047; box-shadow: 0 0 16px rgba(253, 224, 71, 0.55);
+  animation: zap 700ms var(--ease) 900ms both;
+}
+@keyframes zap { 0% { transform: translateX(-30px) skewX(-20deg); opacity: 0; } 60% { transform: translateX(4px) skewX(8deg); opacity: 1; } 100% { transform: none; } } /* ✗ glyph + dotted underline, no strikethrough (A11Y-07) */
+:where(:root:not(.rp-root)) .legend { display: flex; flex-wrap: wrap; gap: 8px 14px; justify-content: center; font-size: 0.82rem; color: var(--text-muted); font-weight: 700; }
+
+/* ---------- stage clear ---------- */
+:where(:root:not(.rp-root)) .stage-title {
+  font-family: var(--font-display); font-weight: 700; font-size: clamp(1.8rem, 9vw, 2.6rem); letter-spacing: 0.06em; margin: 0;
+  background: var(--grad-cool); -webkit-background-clip: text; background-clip: text; color: transparent;
+  animation: slam 600ms var(--ease) both;
+}
+:where(:root:not(.rp-root)) .rank {
+  --rank: var(--accent);
+  display: grid; place-items: center; width: 132px; height: 132px; margin: 4px auto; border-radius: 28px; transform: rotate(-6deg);
+  background: color-mix(in srgb, var(--rank) 16%, var(--surface-2)); border: 3px solid var(--rank);
+  box-shadow: 0 0 30px color-mix(in srgb, var(--rank) 50%, transparent);
+  animation: rank-in 800ms var(--ease) 300ms both;
+}
+:where(:root:not(.rp-root)) .rank[data-rank="S"] { --rank: #fbbf24; }
+:where(:root:not(.rp-root)) .rank[data-rank="A"] { --rank: #22d3ee; }
+:where(:root:not(.rp-root)) .rank[data-rank="B"] { --rank: #a3e635; }
+:where(:root:not(.rp-root)) .rank[data-rank="C"] { --rank: #f472b6; }
+:root[data-theme="light"]:where(:not(.rp-root)) .theme-console .rank[data-rank="S"] { --rank: #b45309; }
+:root[data-theme="light"]:where(:not(.rp-root)) .theme-console .rank[data-rank="A"] { --rank: #0e7490; }
+:root[data-theme="light"]:where(:not(.rp-root)) .theme-console .rank[data-rank="B"] { --rank: #4d7c0f; }
+:root[data-theme="light"]:where(:not(.rp-root)) .theme-console .rank[data-rank="C"] { --rank: #be185d; }
+@keyframes rank-in { 0% { transform: rotate(-40deg) scale(0); opacity: 0; } 70% { transform: rotate(4deg) scale(1.12); opacity: 1; } 100% { transform: rotate(-6deg) scale(1); } }
+
+/* fx canvas (confetti) */
+:where(:root:not(.rp-root)) #fx-canvas { position: fixed; inset: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 900; }
+
+/* reduced motion (game-specific: kill idle loops as well) */
+@media (prefers-reduced-motion: reduce) {
+  :where(:root:not(.rp-root)) .theme-console *, :where(:root:not(.rp-root)) .theme-console *::before, :where(:root:not(.rp-root)) .theme-console *::after {
+    animation-duration: 1ms !important; animation-iteration-count: 1 !important; animation-delay: 0ms !important;
+    transition-duration: 1ms !important;
+  }
+  :where(:root:not(.rp-root)) #fx-canvas { display: none; }
+}
+
+/* topbar fit at 360–420px; programmatic heading focus (tabindex=-1) needs no ring */
+:where(:root:not(.rp-root)) .theme-console .topbar-title { white-space: nowrap; min-width: 0; }
+:where(:root:not(.rp-root)) h1[tabindex="-1"]:focus, :where(:root:not(.rp-root)) h2[tabindex="-1"]:focus, :where(:root:not(.rp-root)) main[tabindex="-1"]:focus { box-shadow: none; }
+
+/* ==========================================================================
+   Review fixes (reviews/fix-log.md) — learner game
+   ========================================================================== */
+/* in-app "Kurangi animasi" = same rules as prefers-reduced-motion (A11Y-10) */
+html[data-motion="reduce"]:where(:not(.rp-root)) .theme-console *, html[data-motion="reduce"]:where(:not(.rp-root)) .theme-console *::before, html[data-motion="reduce"]:where(:not(.rp-root)) .theme-console *::after {
+  animation-duration: 1ms !important; animation-iteration-count: 1 !important; animation-delay: 0ms !important;
+  transition-duration: 1ms !important;
+}
+html[data-motion="reduce"]:where(:not(.rp-root)) #fx-canvas { display: none; }
+
+
+/* bigger small buttons inside the game (A11Y-16) */
+:where(:root:not(.rp-root)) .theme-console .btn-sm { min-height: 44px; min-width: 44px; }
+
+/* time-up choice + Jawab Cepat countdown */
+:where(:root:not(.rp-root)) .timeup { width: 100%; max-width: 420px; text-align: center; }
+
+
+/* ==========================================================================
+   PART 2 — SE BRAND LAYER
+   ========================================================================== */
+
+:root, :root[data-theme="light"] body.cr {
+  color-scheme: light;
+
+  /* ---- ground, surfaces, ink ---- */
+  --se-bg: #FAFAFA;
+  --se-bg-2: #F5F5F5;
+  --se-surface: #FFFFFF;
+  --se-surface-2: #FAFAFA;
+  --se-surface-3: #E5E5E5;
+  --se-border: #E5E5E5;
+  --se-border-strong: #D4D4D4;
+  --se-ink: #171717;
+  --se-text: #171717;
+  --se-on-ink: #FFFFFF;
+  --se-muted: #525252;
+
+  /* ---- brand yellow ---- */
+  --se-yellow: #FFCB1D;
+  --se-yellow-soft: #FFD84F;
+  --se-yellow-press: #E6B317;
+  --se-yellow-ink: #171717;
+  --se-yellow-bg: #FFFBEB;
+  --se-accent-text: #92400E;
+  --se-link: #8E279B;
+
+  /* ---- brand palette ---- */
+  --se-purple: #8E279B;
+  --se-purple-ink: #701F7A;
+  --se-purple-bg: #FAE8FF;
+  --se-purple-mid: #BB33CC;
+  --se-pink: #EC1A64;
+  --se-pink-ink: #CB1153;
+  --se-blue: #2397CB;
+  --se-blue-ink: #1A7299;
+  --se-blue-bg: #E0F2FE;
+  --se-blue-text: #0369A1;
+  --se-red: #EA4134;
+  --se-red-ink: #CB2215;
+  --se-green: #10B981;
+  --se-on-fill: #FFFFFF;
+
+  /* ---- status ---- */
+  --se-success: #047857;
+  --se-success-text: #047857;
+  --se-success-soft: #ECFDF5;
+  --se-danger: #BE123C;
+  --se-danger-text: #BE123C;
+  --se-danger-soft: #FFF1F2;
+  --se-danger-border: #FFE4E6;
+  --se-warn-bg: #FEF3C7;
+  --se-warn-border: #FDE68A;
+  --se-warn-text: #92400E;
+
+  /* ---- answer tiles by position (index 0..3), shape pairing ▲ ◆ ● ■ ---- */
+  --se-opt-1: var(--se-red-ink);  --se-opt-1-ink: var(--se-on-fill);    --se-opt-1-hi: var(--se-red);
+  --se-opt-2: var(--se-blue-ink); --se-opt-2-ink: var(--se-on-fill);    --se-opt-2-hi: var(--se-blue);
+  --se-opt-3: var(--se-yellow);   --se-opt-3-ink: var(--se-yellow-ink); --se-opt-3-hi: var(--se-yellow-press);
+  --se-opt-4: var(--se-purple);   --se-opt-4-ink: var(--se-on-fill);    --se-opt-4-hi: var(--se-purple);
+
+  /* ---- gate cards ---- */
+  --se-teacher: var(--se-purple);
+  --se-student: var(--se-pink-ink);
+
+  /* ---- teams (text-safe on light surfaces) ---- */
+  --se-team-cyan: var(--se-blue-text);
+  --se-team-pink: var(--se-pink-ink);
+  --se-team-lime: var(--se-success);
+  --se-team-amber: var(--se-accent-text);
+  --se-team-violet: var(--se-purple);
+  --se-team-orange: var(--se-red-ink);
+  --se-on-team: var(--se-on-fill);
+
+  /* ---- podium ---- */
+  --se-podium-1: var(--se-yellow);
+  --se-podium-1-ink: var(--se-yellow-ink);
+  --se-podium-2: #545155;
+  --se-podium-3: #92400E;
+
+  /* ---- confetti (read by live-common.js / classroom.js) ---- */
+  --se-confetti: #FFCB1D, #2397CB, #EC1A64, #8E279B, #EA4134, #10B981;
+
+  /* ---- mascot plate ---- */
+  --se-plate: #FAF6F1;
+  --se-plate-ring: var(--se-border);
+
+  /* ---- shadows (the original chunky bottom shadow, charcoal tone), overlays, focus ---- */
+  --se-shadow: 0 2px 0 rgba(23, 23, 23, .12), 0 10px 30px rgba(23, 23, 23, .08);
+  --se-shadow-btn: 0 3px 0 rgba(23, 23, 23, .14);
+  --se-shadow-btn-press: 0 1px 0 rgba(23, 23, 23, .14);
+  --se-depth: rgba(0, 0, 0, .22);
+  --se-ink-depth: #000000;
+  --se-scrim: rgba(0, 0, 0, .25);
+  --se-overlay: rgba(23, 23, 23, .45);
+  --se-shadow-modal: 0 20px 60px rgba(23, 23, 23, .35);
+  --se-focus: 0 0 0 3px var(--se-yellow), 0 0 0 6px var(--se-ink);
+  --se-btn-depth: #D4D4D4;
+  --se-grid-line: transparent;
+}
+
+/* ---- /classroom dark console (charcoal ground); the light toggle re-applies the block above ---- */
+body.cr {
+  color-scheme: dark;
+  --se-bg: #171717;
+  --se-bg-2: #19161A;
+  --se-surface: #262626;
+  --se-surface-2: #282529;
+  --se-surface-3: #3A3A3A;
+  --se-border: #404040;
+  --se-border-strong: #545155;
+  --se-text: #FFFFFF;
+  --se-muted: #D4D4D4;
+  --se-accent-text: #FFCB1D;
+  --se-link: #FFD84F;
+  --se-success-text: #10B981;
+  --se-success-soft: rgba(16, 185, 129, .16);
+  --se-danger-text: #FDA4AF;
+  --se-danger-soft: rgba(244, 63, 94, .16);
+  --se-warn-bg: rgba(255, 203, 29, .14);
+  --se-warn-text: #FFCB1D;
+  --se-yellow-bg: rgba(255, 203, 29, .16);
+  --se-team-cyan: #2397CB;
+  --se-team-pink: #EC1A64;
+  --se-team-lime: #10B981;
+  --se-team-amber: #FFCB1D;
+  --se-team-violet: #BB33CC;
+  --se-team-orange: #EA4134;
+  --se-on-team: #171717;
+  --se-plate-ring: #404040;
+  --se-btn-depth: #000000;
+  --se-shadow: 0 1px 2px rgba(0, 0, 0, .4);
+  --se-shadow-modal: 0 10px 30px rgba(0, 0, 0, .45);
+  --se-overlay: rgba(0, 0, 0, .72);
+  --se-focus: 0 0 0 3px var(--se-bg), 0 0 0 6px var(--se-yellow);
+  --se-grid-line: rgba(255, 255, 255, .03);
+}
+
+/* ---- non-colour tokens (shared) ---- */
+:root {
+  --se-font-display: "Fredoka", "Nunito", system-ui, sans-serif;
+  --se-font-body: "Nunito", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif,
+    "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji";
+  --se-w-regular: 400;
+  --se-w-semibold: 600;
+  --se-w-bold: 700;
+  --se-w-extrabold: 800;
+  --se-radius-sm: 8px;
+  --se-radius-btn: 14px;
+  --se-radius: 16px;
+  --se-radius-lg: 18px;
+  --se-radius-xl: 26px;
+  --se-radius-2xl: 28px;
+  --se-radius-pill: 9999px;
+  --se-space-1: 4px;
+  --se-space-2: 8px;
+  --se-space-3: 12px;
+  --se-space-4: 16px;
+  --se-space-5: 20px;
+  --se-space-6: 24px;
+  --se-space-7: 28px;
+  --se-space-8: 32px;
+  --se-space-9: 40px;
+  --se-space-10: 56px;
+  --se-tap: 44px;
+  --se-col-narrow: 560px;
+  --se-content-max: 1100px;
+  --se-avatar-xs: 28px;
+  --se-avatar-sm: 40px;
+  --se-avatar-md: 72px;
+  --se-avatar-lg: 112px;
+  --se-avatar-xl: 168px;
+  --se-logo-h: 28px;
+  --se-icon: 1.15em;
+  --se-dur: 160ms;
+  --se-ease: cubic-bezier(.2, .8, .2, 1);
+}

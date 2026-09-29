@@ -1,0 +1,462 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="light">
+  <title>Host a game · PlayClass</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎲</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700;800&display=swap">
+  <link rel="stylesheet" href="/static/theme-se.css">
+  <link rel="stylesheet" href="/static/live.css">
+  <script type="module" src="/static/host.js"></script>
+</head>
+<body class="lv lv-host" data-screen="create">
+  <a class="lv-skip" href="#main" data-i18n="skip">Skip to content</a>
+  <header class="lv-top">
+    <a class="lv-brand" href="/"><span class="se-wordmark">Play<b>Class</b></span></a>
+    <span id="top-pin" class="lv-pill" hidden></span>
+    <span class="lv-grow"></span>
+    <button type="button" id="btn-music" class="lv-icon-btn" aria-pressed="false" hidden><svg class="ic" aria-hidden="true" focusable="false"><use href="/static/icons.svg#music"/></svg></button>
+    <button type="button" id="btn-mute" class="lv-icon-btn" aria-pressed="false"><svg class="ic" aria-hidden="true" focusable="false"><use href="/static/icons.svg#volume-2"/></svg></button>
+    <button type="button" id="btn-settings" class="lv-icon-btn" aria-haspopup="dialog" hidden data-i18n-aria="settings" data-i18n-title="settings"><svg class="ic" aria-hidden="true" focusable="false"><use href="/static/icons.svg#settings"/></svg></button>
+    <button type="button" id="btn-fs" class="lv-icon-btn" data-i18n-aria="fullscreen" data-i18n-title="fullscreen"><svg class="ic" aria-hidden="true" focusable="false"><use href="/static/icons.svg#maximize"/></svg></button>
+    <div id="lang" class="lv-lang"></div>
+  </header>
+  <div id="conn" class="lv-pill lv-conn" role="status" hidden></div>
+
+  <main id="main" class="lv-main" tabindex="-1">
+    <div class="se-backbar" id="backbar" hidden>
+      <button type="button" id="nav-back" class="lv-btn lv-btn-sm se-back"><svg class="ic" aria-hidden="true" focusable="false"><use href="/static/icons.svg#arrow-left"/></svg><span id="nav-back-label" data-i18n="back">Back</span></button>
+    </div>
+
+    <!-- ============ CREATE ============ -->
+    <section class="lv-screen" data-screen="create" aria-labelledby="create-title" hidden>
+      <div class="lv-row" style="justify-content:space-between">
+        <h1 id="create-title" style="font-size:2.2rem" data-i18n="create_title">Create a game</h1>
+        <button type="button" id="btn-resume" class="lv-btn lv-btn-dark" hidden></button>
+      </div>
+      <section id="mygames" class="lv-card hw-mygames" aria-labelledby="mg-title" hidden>
+        <h2 id="mg-title" class="se-card-label" data-i18n="my_games">My games</h2>
+        <p class="lv-hint" style="margin:0" data-i18n="my_games_hint"></p>
+        <ul id="mg-list" class="hw-mg-list"></ul>
+      </section>
+      <section id="school-card" class="lv-card se-school" aria-labelledby="school-title">
+        <div class="se-school-head">
+          <h2 id="school-title" class="se-card-label" data-i18n="your_school">Your school</h2>
+          <button type="button" id="school-change" class="se-linkbtn" aria-controls="school-fields" aria-expanded="false" hidden data-i18n="change">Change</button>
+        </div>
+        <p id="school-summary" class="se-school-summary" hidden></p>
+        <div id="school-fields" class="lv-setup se-school-fields">
+          <div class="lv-field">
+            <label for="g-school"><span data-i18n="school">School</span> <span class="se-req" aria-hidden="true">*</span></label>
+            <input id="g-school" form="create-form" class="lv-input" maxlength="200" list="dl-schools" autocomplete="organization" required
+                   data-i18n-ph="school_ph" aria-describedby="g-school-err">
+            <datalist id="dl-schools"></datalist>
+            <p id="g-school-err" class="lv-error" aria-live="polite"></p>
+          </div>
+        </div>
+        <p class="lv-hint se-school-note" data-i18n="school_saved">Saved on this device.</p>
+      </section>
+      <section class="lv-card hw-mode-card" aria-labelledby="mode-title">
+        <fieldset class="hw-fs">
+          <legend id="mode-title" class="se-card-label hw-legend" data-i18n="how_play">How will students play?</legend>
+          <div class="hw-modes">
+            <input type="radio" name="mode" id="mode-live" value="live" checked>
+            <label for="mode-live" class="hw-mode" data-tone="blue">
+              <span class="hw-mode-art"><span class="hw-mode-ic"><svg class="ic" aria-hidden="true" focusable="false"><use href="/static/icons.svg#play"/></svg></span><span class="se-plate se-plate-sm" aria-hidden="true"><img src="/static/brand/mascots/blue-256.webp" alt="" width="256" height="256"></span></span>
+              <span class="hw-mode-title" data-i18n="mode_live">On their own devices</span>
+              <small data-i18n="mode_live_sub"></small>
+            </label>
+            <input type="radio" name="mode" id="mode-hw" value="hw">
+            <label for="mode-hw" class="hw-mode" data-tone="purple">
+              <span class="hw-mode-art"><span class="hw-mode-ic"><svg class="ic" aria-hidden="true" focusable="false"><use href="/static/icons.svg#calendar-clock"/></svg></span><span class="se-plate se-plate-sm" aria-hidden="true"><img src="/static/brand/mascots/purple-256.webp" alt="" width="256" height="256"></span></span>
+              <span class="hw-mode-title" data-i18n="mode_hw">Homework</span>
+              <small data-i18n="mode_hw_sub"></small>
+            </label>
+            <input type="radio" name="mode" id="mode-present" value="present">
+            <label for="mode-present" class="hw-mode" data-tone="green">
+              <span class="hw-mode-art"><span class="hw-mode-ic"><svg class="ic" aria-hidden="true" focusable="false"><use href="/static/icons.svg#graduation-cap"/></svg></span><span class="se-plate se-plate-sm" aria-hidden="true"><img src="/static/brand/mascots/green-256.webp" alt="" width="256" height="256"></span></span>
+              <span class="hw-mode-title"><span data-i18n="mode_present">Teacher presents</span> <span class="hw-mode-tag" data-i18n="mode_present_tag">No student devices</span></span>
+              <small data-i18n="mode_present_sub"></small>
+            </label>
+          </div>
+        </fieldset>
+      </section>
+      <div class="lv-tabs" role="tablist" aria-labelledby="create-title">
+        <button type="button" role="tab" class="lv-tab" id="tab-ready" aria-controls="panel-ready" aria-selected="true" data-i18n="tab_ready">Ready-made quizzes</button>
+        <button type="button" role="tab" class="lv-tab" id="tab-mine" aria-controls="panel-mine" aria-selected="false" tabindex="-1" data-i18n="tab_mine">My quizzes</button>
+      </div>
+      <div id="panel-ready" role="tabpanel" aria-labelledby="tab-ready">
+        <div id="packs" class="lv-packs" aria-live="polite"></div>
+      </div>
+      <div id="panel-mine" role="tabpanel" aria-labelledby="tab-mine" hidden>
+        <div class="lv-row" style="margin-bottom:12px">
+          <button type="button" id="btn-new-quiz" class="lv-btn lv-btn-primary"><svg class="ic" aria-hidden="true" focusable="false"><use href="/static/icons.svg#plus"/></svg><span data-i18n="new_quiz">New quiz</span></button>
+          <span class="lv-hint" data-i18n="mine_hint"></span>
+        </div>
+        <div id="myquizzes" class="lv-packs"></div>
+      </div>
+
+      <section id="setup" class="lv-card" aria-labelledby="setup-title" tabindex="-1">
+        <h2 id="setup-title" style="font-size:1.5rem;margin-bottom:12px" data-i18n="setup_title">Game settings</h2>
+        <p id="setup-quiz" class="lv-pill" style="margin:0 0 14px"></p>
+        <form id="create-form" class="lv-screen" style="gap:16px" novalidate>
+          <div class="lv-setup" data-modes="live hw">
+            <div class="lv-field">
+              <label for="g-title" data-i18n="game_title">Game title (optional)</label>
+              <input id="g-title" class="lv-input" maxlength="120" data-i18n-ph="game_title_ph">
+            </div>
+            <fieldset class="lv-field" style="border:0;padding:0;margin:0">
+              <legend class="lv-label" data-i18n="how_many">How many questions?</legend>
+              <div class="lv-seg" id="g-count"></div>
+            </fieldset>
+          </div>
+          <fieldset class="lv-field" style="border:0;padding:0;margin:0" data-modes="live">
+            <legend class="lv-label" data-i18n="results_mode">When do students see results?</legend>
+            <div class="lv-choice">
+              <input type="radio" name="instant" id="g-instant-on" value="1" checked>
+              <label for="g-instant-on"><span data-i18n="instant_on"></span><small data-i18n="instant_on_sub"></small></label>
+              <input type="radio" name="instant" id="g-instant-off" value="0">
+              <label for="g-instant-off"><span data-i18n="instant_off"></span><small data-i18n="instant_off_sub"></small></label>
+            </div>
+          </fieldset>
+          <fieldset class="lv-field hw-deadline" data-modes="hw" style="border:0;padding:0;margin:0" aria-describedby="g-dl-hint">
+            <legend class="lv-label" data-i18n="deadline">Deadline</legend>
+            <div class="lv-seg" id="g-dl-chips"></div>
+            <div class="hw-dl-fields" id="g-dl-fields">
+              <div class="lv-field"><label for="g-dl-date" data-i18n="dl_date">Date</label><input type="date" id="g-dl-date" class="lv-input" aria-describedby="g-dl-err"></div>
+              <div class="lv-field"><label for="g-dl-time" data-i18n="dl_time">Time</label><input type="time" id="g-dl-time" class="lv-input" aria-describedby="g-dl-err"></div>
+            </div>
+            <p id="g-dl-hint" class="lv-hint" style="margin:0" data-i18n="dl_hint"></p>
+            <p id="g-dl-err" class="lv-error" aria-live="polite"></p>
+          </fieldset>
+          <label class="lv-switch hw-switch" data-modes="hw"><input type="checkbox" id="g-speed"> <span><span data-i18n="speed_bonus">Count answer speed</span><small data-i18n="speed_bonus_sub"></small></span></label>
+          <label class="lv-switch hw-switch" data-modes="hw"><input type="checkbox" id="g-shuffle"> <span><span data-i18n="shuffle">Shuffle questions per student</span><small data-i18n="shuffle_sub"></small></span></label>
+          <label class="lv-switch" data-modes="live hw"><input type="checkbox" id="g-rename" checked> <span data-i18n="allow_rename">Allow name changes</span></label>
+          <fieldset class="lv-field" style="border:0;padding:0;margin:0" data-modes="present">
+            <legend class="lv-label" data-i18n="grouping_label">Who answers?</legend>
+            <div class="lv-choice">
+              <input type="radio" name="grouping" id="g-grp-individual" value="individual" checked>
+              <label for="g-grp-individual"><span class="hw-grp"><svg class="ic" aria-hidden="true" focusable="false"><use href="/static/icons.svg#user"/></svg><span data-i18n="grp_individual">Individuals</span></span><small data-i18n="grp_individual_sub"></small></label>
+              <input type="radio" name="grouping" id="g-grp-teams" value="teams">
+              <label for="g-grp-teams"><span class="hw-grp"><svg class="ic" aria-hidden="true" focusable="false"><use href="/static/icons.svg#users"/></svg><span data-i18n="grp_teams">Groups</span></span><small data-i18n="grp_teams_sub"></small></label>
+            </div>
+            <p class="lv-hint" style="margin:6px 0 0" data-i18n="present_hint"></p>
+          </fieldset>
+          <details class="lv-details" data-modes="live hw">
+            <summary data-i18n="more_details">More details (optional)</summary>
+            <div class="lv-setup" style="margin-top:8px">
+              <div class="lv-field"><label for="g-teacher" data-i18n="teacher_name"></label><input id="g-teacher" class="lv-input" maxlength="120"></div>
+            </div>
+          </details>
+          <p id="create-err" class="lv-error" role="alert"></p>
+          <div class="lv-row">
+            <button type="submit" id="btn-create" class="lv-btn lv-btn-primary lv-btn-lg" data-i18n="create">Create game</button>
+          </div>
+        </form>
+      </section>
+      <details class="lv-details lv-tips"><summary><span data-i18n="tips">Tips for game master</span></summary><p data-i18n="tip_create"></p></details>
+    </section>
+
+    <!-- ============ HOMEWORK: SHARE ============ -->
+    <section class="lv-screen hw-share-screen" data-screen="share" aria-labelledby="sh-title" hidden>
+      <div class="hw-share-head">
+        <span class="se-plate se-plate-md" aria-hidden="true"><img src="/static/brand/mascots/purple-256.webp" alt="" width="256" height="256"></span>
+        <div><h1 id="sh-title" data-i18n="hw_share_title">Your homework is ready!</h1><p class="lv-hint" style="margin:4px 0 0"><span id="sh-game"></span> · <span data-i18n="hw_share_sub"></span></p></div>
+      </div>
+      <div class="lv-card hw-share">
+        <div class="hw-share-pin"><span data-i18n="pin_label">Game PIN</span><span class="lv-pin" id="sh-pin"></span></div>
+        <div class="hw-share-link">
+          <label for="sh-url" class="lv-label" data-i18n="hw_link">Join link</label>
+          <div class="hw-copyrow"><input id="sh-url" class="lv-input" readonly lang="en"><button type="button" id="sh-copy" class="lv-btn lv-btn-dark"><svg class="ic" aria-hidden="true" focusable="false"><use href="/static/icons.svg#copy"/></svg><span data-i18n="copy_join">Copy link</span></button></div>
+          <p class="lv-row" style="margin:0"><span id="sh-due" class="lv-pill"><svg class="ic" aria-hidden="true" focusable="false"><use href="/static/icons.svg#calendar-clock"/></svg><span></span></span></p>
+        </div>
+      </div>
+      <section class="lv-card hw-board" aria-labelledby="sh-board-title">
+        <h2 id="sh-board-title" class="se-card-label" data-i18n="hw_board">For the whiteboard</h2>
+        <p id="sh-board" class="hw-board-text" lang="en"></p>
+        <div class="lv-row">
+          <button type="button" id="sh-copy-text" class="lv-btn"><svg class="ic" aria-hidden="true" focusable="false"><use href="/static/icons.svg#copy"/></svg><span data-i18n="copy_text">Copy text</span></button>
+          <button type="button" id="sh-print" class="lv-btn"><svg class="ic" aria-hidden="true" focusable="false"><use href="/static/icons.svg#download"/></svg><span data-i18n="print">Print</span></button>
+        </div>
+      </section>
+      <div class="lv-row"><button type="button" id="sh-monitor" class="lv-btn lv-btn-primary lv-btn-lg"><svg class="ic" aria-hidden="true" focusable="false"><use href="/static/icons.svg#chart-column"/></svg><span data-i18n="open_monitor">Open the monitor</span></button></div>
+    </section>
+
+    <!-- ============ HOMEWORK: MONITOR ============ -->
+    <section class="lv-screen hw-monitor" data-screen="monitor" aria-labelledby="mo-title" hidden>
+      <div class="hw-mo-head">
+        <div class="hw-mo-titles">
+          <span class="lv-tag" data-i18n="hw_monitor">Homework monitor</span>
+          <h1 id="mo-title"></h1>
+          <p class="lv-row hw-mo-meta"><span id="mo-status" class="lv-pill"></span><span id="mo-pin" class="lv-pill"></span><span id="mo-due" class="lv-pill"></span></p>
+        </div>
+        <div class="lv-row hw-mo-actions">
+          <button type="button" id="mo-share" class="lv-btn"><svg class="ic" aria-hidden="true" focusable="false"><use href="/static/icons.svg#link"/></svg><span data-i18n="share">Share</span></button>
+          <a id="mo-csv" class="lv-btn lv-btn-dark" download><svg class="ic" aria-hidden="true" focusable="false"><use href="/static/icons.svg#download"/></svg><span data-i18n="csv">Download results (CSV)</span></a>
+        </div>
+      </div>
+      <section class="lv-card hw-controls" aria-labelledby="mo-ctrl-title">
+        <h2 id="mo-ctrl-title" class="sr-only" data-i18n="settings">Settings</h2>
+        <div class="lv-row">
+          <button type="button" id="mo-pause" class="lv-btn lv-btn-dark" aria-describedby="mo-pause-warn"></button>
+          <button type="button" id="mo-deadline" class="lv-btn"><svg class="ic" aria-hidden="true" focusable="false"><use href="/static/icons.svg#calendar-clock"/></svg><span data-i18n="change_deadline">Change deadline</span></button>
+          <label class="lv-switch"><input type="checkbox" id="mo-rename"> <span data-i18n="allow_rename">Allow name changes</span></label>
+          <span class="lv-grow"></span>
+          <button type="button" id="mo-end" class="lv-btn lv-btn-danger"><svg class="ic" aria-hidden="true" focusable="false"><use href="/static/icons.svg#flag"/></svg><span data-i18n="end_now">End now</span></button>
+        </div>
+        <p id="mo-pause-warn" class="hw-warn"><svg class="ic" aria-hidden="true" focusable="false"><use href="/static/icons.svg#info"/></svg><span data-i18n="pause_warn"></span></p>
+      </section>
+      <section class="lv-card hw-progress" aria-labelledby="mo-prog-title">
+        <h2 id="mo-prog-title" class="se-card-label" data-i18n="hw_progress">Progress</h2>
+        <dl class="hw-stats">
+          <div class="hw-stat"><dt data-i18n="prog_joined">Joined</dt><dd id="mo-joined">0</dd></div>
+          <div class="hw-stat is-prog"><dt data-i18n="prog_in_progress">In progress</dt><dd id="mo-inprog">0</dd></div>
+          <div class="hw-stat is-fin"><dt data-i18n="prog_finished">Finished</dt><dd id="mo-fin">0</dd></div>
+        </dl>
+        <div id="mo-bar" class="hw-bar" role="progressbar" aria-valuemin="0" aria-labelledby="mo-prog-title"><span class="hw-seg is-fin"></span><span class="hw-seg is-prog"></span></div>
+        <p id="mo-bar-text" class="lv-hint hw-legend-row"></p>
+      </section>
+      <div class="hw-mo-grid">
+        <section class="lv-card">
+          <h2 id="mo-st-title" class="se-card-label" data-i18n="students">Students</h2>
+          <div class="hw-table-wrap" tabindex="0" role="region" aria-labelledby="mo-st-title"><table id="mo-students" class="hw-table"></table></div>
+          <div id="mo-empty" class="se-empty" hidden><span class="se-plate se-plate-sm" aria-hidden="true"><img src="/static/brand/mascots/green-256.webp" alt="" width="256" height="256"></span><p class="lv-hint" data-i18n="no_students"></p></div>
+        </section>
+        <section class="lv-card" aria-labelledby="mo-lb-title">
+          <h2 id="mo-lb-title" class="se-card-label" data-i18n="leaderboard">Leaderboard</h2>
+          <ol id="mo-lb" class="lv-lb-list" style="margin-top:10px"></ol>
+        </section>
+      </div>
+      <section class="lv-card">
+        <h2 id="mo-q-title" class="se-card-label" data-i18n="per_question">Questions</h2>
+        <div class="hw-table-wrap" tabindex="0" role="region" aria-labelledby="mo-q-title"><table id="mo-questions" class="hw-table"></table></div>
+      </section>
+    </section>
+
+    <!-- ============ QUIZ EDITOR ============ -->
+    <section class="lv-screen" data-screen="editor" aria-labelledby="ed-title" hidden>
+      <div class="lv-row" style="justify-content:space-between">
+        <button type="button" id="ed-back" class="lv-btn lv-btn-sm"><svg class="ic" aria-hidden="true" focusable="false"><use href="/static/icons.svg#arrow-left"/></svg><span data-i18n="back">Back</span></button>
+        <div class="lv-row">
+          <button type="button" id="ed-copy" class="lv-btn lv-btn-sm"><svg class="ic" aria-hidden="true" focusable="false"><use href="/static/icons.svg#link"/></svg><span data-i18n="copy_link">Copy edit link</span></button>
+          <button type="button" id="ed-use" class="lv-btn lv-btn-primary"><svg class="ic" aria-hidden="true" focusable="false"><use href="/static/icons.svg#play"/></svg><span data-i18n="use">Use</span></button>
+        </div>
+      </div>
+      <h1 id="ed-title" style="font-size:2rem" data-i18n="edit_quiz">Edit quiz</h1>
+      <p class="lv-hint" id="ed-saved-note" data-i18n="saved_device"></p>
+      <form id="ed-name-form" class="lv-row" novalidate>
+        <div class="lv-field lv-grow" style="min-width:220px">
+          <label for="ed-name" data-i18n="quiz_name">Quiz name</label>
+          <input id="ed-name" class="lv-input" maxlength="120" aria-describedby="ed-name-err" required>
+          <p id="ed-name-err" class="lv-error" aria-live="polite"></p>
+        </div>
+        <button type="submit" class="lv-btn lv-btn-dark" style="align-self:center" data-i18n="save">Save</button>
+      </form>
+      <div class="lv-row" style="justify-content:space-between">
+        <h2 id="ed-count" style="font-size:1.4rem"></h2>
+        <button type="button" id="ed-add" class="lv-btn lv-btn-primary"><svg class="ic" aria-hidden="true" focusable="false"><use href="/static/icons.svg#plus"/></svg><span data-i18n="add_question">Add question</span></button>
+      </div>
+      <ol id="ed-list" class="lv-qlist" aria-labelledby="ed-count"></ol>
+      <p id="ed-empty" class="lv-card lv-hint" data-i18n="no_questions" hidden></p>
+    </section>
+
+    <!-- ============ LOBBY ============ -->
+    <section class="lv-screen lv-stage lv-lobby" data-screen="lobby" aria-labelledby="lobby-title" hidden>
+      <h1 id="lobby-title" class="sr-only"></h1>
+      <div class="lv-joinbar">
+        <div class="lv-joinurl">
+          <span data-i18n="lobby_join_at">Join at</span>
+          <strong id="join-url" lang="en"></strong>
+          <span class="lv-hint" style="font-size:.7em" data-i18n="lobby_steps"></span>
+        </div>
+        <div class="lv-pinbox"><span data-i18n="pin_label">Game PIN</span><span class="lv-pin" id="lobby-pin"></span></div>
+      </div>
+      <div class="lv-lobby-head">
+        <span class="lv-count" id="lobby-count" aria-live="polite"></span>
+        <span id="lobby-waiting" class="lv-q-sub se-empty-inline"><span class="se-plate se-plate-sm" aria-hidden="true"><img src="/static/brand/mascots/green-256.webp" alt="" width="256" height="256"></span><span data-i18n="waiting_players"></span></span>
+        <span class="lv-grow"></span>
+        <button type="button" id="btn-start" class="lv-btn lv-btn-primary lv-btn-lg" data-next><span data-i18n="start">Start</span> <svg class="ic" aria-hidden="true" focusable="false"><use href="/static/icons.svg#play"/></svg></button>
+      </div>
+      <ul id="names" class="lv-names" aria-labelledby="lobby-count"></ul>
+    </section>
+
+    <!-- ============ QUESTION ============ -->
+    <section class="lv-screen lv-stage lv-q" data-screen="question" aria-labelledby="hq-text" hidden>
+      <div class="lv-q-head">
+        <div class="lv-ring" id="hq-ring" role="timer" aria-live="off"><svg viewBox="0 0 120 120" aria-hidden="true"><circle class="bg" cx="60" cy="60" r="52"/><circle class="fg" cx="60" cy="60" r="52"/></svg><span id="hq-sec"></span></div>
+        <span id="hq-count"></span>
+        <span class="lv-answered" id="hq-answered" aria-live="polite"></span>
+      </div>
+      <div class="lv-q-card">
+        <h1 id="hq-text" class="lv-q-text" lang="en"></h1>
+        <p id="hq-sub" class="lv-q-sub"></p>
+      </div>
+      <div id="hq-tiles" class="lv-q-tiles"></div>
+      <aside class="lv-side" id="side" aria-labelledby="side-title">
+        <h2 id="side-title" data-i18n="live_lb">Live ranking</h2>
+        <p class="lv-side-note" id="side-note"></p>
+        <ol id="side-list"></ol>
+      </aside>
+    </section>
+
+    <!-- ============ REVEAL ============ -->
+    <section class="lv-screen lv-stage lv-reveal" data-screen="reveal" aria-labelledby="rv-title" hidden>
+      <div class="lv-q-card" style="padding:clamp(10px,2vmin,24px)">
+        <p class="lv-q-sub" id="rv-q" lang="en" style="margin:0"></p>
+        <h1 id="rv-title" class="lv-reveal-answer"></h1>
+      </div>
+      <p id="rv-top" class="lv-q-sub" style="text-align:center;margin:0"></p>
+      <div id="rv-bars" class="lv-bars"></div>
+    </section>
+
+    <!-- ============ LEADERBOARD ============ -->
+    <section class="lv-screen lv-stage" data-screen="leaderboard" aria-labelledby="lb-h" hidden style="grid-template-rows:auto minmax(0,1fr)">
+      <h1 id="lb-h" class="lv-q-text" style="text-align:center;font-size:clamp(2rem,6vmin,4.4rem)" data-i18n="leaderboard">Leaderboard</h1>
+      <ol id="lb-rows" class="lv-lb" style="list-style:none;padding:0;margin:0 auto"></ol>
+    </section>
+
+    <!-- ============ PODIUM ============ -->
+    <section class="lv-screen lv-stage" data-screen="podium" aria-labelledby="pd-h" hidden style="grid-template-rows:auto minmax(0,1fr) auto">
+      <h1 id="pd-h" class="lv-q-text" style="text-align:center;font-size:clamp(2rem,6vmin,4.4rem)" data-i18n="podium_title">Winners!</h1>
+      <ol id="podium" class="lv-podium" style="list-style:none;padding:0;margin:0 auto"></ol>
+      <div class="lv-row" style="justify-content:center">
+        <p id="pd-summary" class="lv-q-sub" style="margin:0"></p>
+        <a id="pd-csv" class="lv-btn lv-btn-dark" download><svg class="ic" aria-hidden="true" focusable="false"><use href="/static/icons.svg#download"/></svg><span data-i18n="csv">Download results (CSV)</span></a>
+        <button type="button" id="pd-new" class="lv-btn lv-btn-primary" data-i18n="new_game">New game</button>
+      </div>
+    </section>
+
+    <div id="controls" class="lv-controls" hidden>
+      <button type="button" id="btn-next" class="lv-btn lv-btn-dark lv-btn-lg"></button>
+      <button type="button" id="btn-end" class="lv-btn lv-btn-danger lv-btn-sm" data-i18n="end_game">End game</button>
+      <span class="lv-keys" data-i18n="keys_hint"></span>
+      <span class="lv-grow"></span>
+      <details class="lv-details lv-tips" id="tips"><summary><span data-i18n="tips">Tips for game master</span></summary><p id="tips-text"></p></details>
+    </div>
+  </main>
+  <footer class="se-foot"><p>PlayClass 2026</p></footer>
+
+  <!-- dialogs -->
+  <dialog id="dlg-player" class="lv-dialog" aria-labelledby="pl-title">
+    <form id="pl-form" class="lv-screen" style="gap:12px" novalidate>
+      <h2 id="pl-title" data-i18n="rename_player">Rename player</h2>
+      <div class="lv-field">
+        <label for="pl-input" data-i18n="nick_label">Nickname</label>
+        <input id="pl-input" class="lv-input" maxlength="20" aria-describedby="pl-err" required>
+        <p id="pl-err" class="lv-error" aria-live="polite"></p>
+      </div>
+      <div class="lv-row lv-row-end">
+        <button type="button" class="lv-btn" data-close data-i18n="cancel">Cancel</button>
+        <button type="submit" class="lv-btn lv-btn-primary" data-i18n="save">Save</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="dlg-settings" class="lv-dialog" aria-labelledby="st-title">
+    <form id="st-form" class="lv-screen" style="gap:12px" novalidate>
+      <h2 id="st-title" data-i18n="settings">Settings</h2>
+      <fieldset class="lv-field" style="border:0;padding:0;margin:0">
+        <legend class="lv-label" data-i18n="results_mode"></legend>
+        <div class="lv-choice" style="grid-template-columns:1fr">
+          <input type="radio" name="st-instant" id="st-instant-on" value="1">
+          <label for="st-instant-on"><span data-i18n="instant_on"></span><small data-i18n="instant_on_sub"></small></label>
+          <input type="radio" name="st-instant" id="st-instant-off" value="0">
+          <label for="st-instant-off"><span data-i18n="instant_off"></span><small data-i18n="instant_off_sub"></small></label>
+        </div>
+      </fieldset>
+      <label class="lv-switch"><input type="checkbox" id="st-rename"> <span data-i18n="allow_rename"></span></label>
+      <p id="st-err" class="lv-error" role="alert"></p>
+      <div class="lv-row lv-row-end">
+        <button type="button" class="lv-btn" data-close data-i18n="cancel">Cancel</button>
+        <button type="submit" class="lv-btn lv-btn-primary" data-i18n="save">Save</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="dlg-deadline" class="lv-dialog" aria-labelledby="dd-title" style="width:min(94vw,520px)">
+    <form id="dd-form" class="lv-screen" style="gap:12px" novalidate>
+      <h2 id="dd-title" data-i18n="change_deadline">Change deadline</h2>
+      <fieldset class="lv-field hw-deadline" style="border:0;padding:0;margin:0" aria-describedby="dd-dl-hint">
+        <legend class="lv-label" data-i18n="deadline">Deadline</legend>
+        <div class="lv-seg" id="dd-dl-chips"></div>
+        <div class="hw-dl-fields" id="dd-dl-fields">
+          <div class="lv-field"><label for="dd-dl-date" data-i18n="dl_date">Date</label><input type="date" id="dd-dl-date" class="lv-input" aria-describedby="dd-dl-err"></div>
+          <div class="lv-field"><label for="dd-dl-time" data-i18n="dl_time">Time</label><input type="time" id="dd-dl-time" class="lv-input" aria-describedby="dd-dl-err"></div>
+        </div>
+        <p id="dd-dl-hint" class="lv-hint" style="margin:0" data-i18n="dl_hint"></p>
+        <p id="dd-dl-err" class="lv-error" aria-live="polite"></p>
+      </fieldset>
+      <p id="dd-err" class="lv-error" role="alert"></p>
+      <div class="lv-row lv-row-end">
+        <button type="button" class="lv-btn" data-close data-i18n="cancel">Cancel</button>
+        <button type="submit" class="lv-btn lv-btn-primary" data-i18n="save">Save</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="dlg-confirm" class="lv-dialog" aria-labelledby="cf-title">
+    <form method="dialog" class="lv-screen" style="gap:16px">
+      <h2 id="cf-title"></h2>
+      <div class="lv-row lv-row-end">
+        <button type="submit" value="no" class="lv-btn" data-i18n="cancel">Cancel</button>
+        <button type="submit" value="yes" class="lv-btn lv-btn-dark" id="cf-yes"></button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="dlg-question" class="lv-dialog" aria-labelledby="qf-title" style="width:min(96vw,1000px)">
+    <form id="qf-form" class="lv-screen" style="gap:14px" novalidate>
+      <div class="lv-row"><button type="button" id="qf-back" class="lv-btn lv-btn-sm se-back"><svg class="ic" aria-hidden="true" focusable="false"><use href="/static/icons.svg#arrow-left"/></svg><span data-i18n="back">Back</span></button></div>
+      <h2 id="qf-title"></h2>
+      <div class="lv-editor-grid">
+        <div class="lv-screen" style="gap:14px">
+          <div class="lv-field">
+            <label for="qf-prompt" data-i18n="q_text">Question</label>
+            <textarea id="qf-prompt" class="lv-input" rows="2" maxlength="300" aria-describedby="qf-prompt-err" required></textarea>
+            <p id="qf-prompt-err" class="lv-error" aria-live="polite"></p>
+          </div>
+          <fieldset class="lv-field" style="border:0;padding:0;margin:0" aria-describedby="qf-opts-err">
+            <legend class="lv-label" data-i18n="answers">Answers</legend>
+            <div class="lv-row" style="margin-bottom:6px">
+              <button type="button" id="qf-tf" class="lv-btn lv-btn-sm" data-i18n="tf_preset">True / False</button>
+              <button type="button" id="qf-add-opt" class="lv-btn lv-btn-sm"><svg class="ic" aria-hidden="true" focusable="false"><use href="/static/icons.svg#plus"/></svg><span data-i18n="add_answer">Add answer</span></button>
+            </div>
+            <div id="qf-opts" class="lv-screen" style="gap:8px"></div>
+            <p id="qf-opts-err" class="lv-error" aria-live="polite"></p>
+          </fieldset>
+          <div class="lv-setup" style="grid-template-columns:repeat(auto-fit,minmax(200px,1fr))">
+            <fieldset class="lv-field" style="border:0;padding:0;margin:0">
+              <legend class="lv-label" data-i18n="time_limit">Time limit</legend>
+              <div class="lv-seg" id="qf-time"></div>
+            </fieldset>
+            <fieldset class="lv-field" style="border:0;padding:0;margin:0">
+              <legend class="lv-label" data-i18n="points">Points</legend>
+              <div class="lv-seg" id="qf-points"></div>
+            </fieldset>
+          </div>
+        </div>
+        <div>
+          <p class="lv-label" id="qf-prev-label" data-i18n="preview">Student preview</p>
+          <div class="lv-preview" aria-labelledby="qf-prev-label">
+            <p id="qf-prev-q" class="lv-prompt" style="font-size:1.15rem;margin:0 0 10px" lang="en"></p>
+            <div id="qf-prev-tiles"></div>
+          </div>
+        </div>
+      </div>
+      <p id="qf-err" class="lv-error" role="alert"></p>
+      <div class="lv-row lv-row-end">
+        <button type="button" class="lv-btn" data-close data-i18n="cancel">Cancel</button>
+        <button type="submit" class="lv-btn lv-btn-primary" id="qf-save" data-i18n="save_question">Save question</button>
+      </div>
+    </form>
+  </dialog>
+
+  <canvas id="fx-canvas" aria-hidden="true"></canvas>
+  <div id="lv-toast" class="lv-toast" role="status" hidden></div>
+  <div id="lv-announcer" class="sr-only" aria-live="polite"></div>
+</body>
+</html>

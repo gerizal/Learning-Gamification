@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="light">
+  <title>Join a game · PlayClass</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎲</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700;800&display=swap">
+  <link rel="stylesheet" href="/static/theme-se.css">
+  <link rel="stylesheet" href="/static/live.css">
+  <script type="module" src="/static/play.js"></script>
+</head>
+<body class="lv lv-play">
+  <a class="lv-skip" href="#main" data-i18n="skip">Skip to content</a>
+  <header class="lv-top">
+    <a class="lv-brand" href="/"><span class="se-wordmark">Play<b>Class</b></span></a>
+    <span class="lv-grow"></span>
+    <div id="lang" class="lv-lang"></div>
+  </header>
+  <div id="conn" class="lv-pill lv-conn" role="status" hidden></div>
+
+  <main id="main" class="lv-main" tabindex="-1">
+    <div class="se-toprow">
+    <div class="se-backbar" id="backbar" hidden>
+      <button type="button" id="nav-back" class="lv-btn lv-btn-sm se-back"><svg class="ic" aria-hidden="true" focusable="false"><use href="/static/icons.svg#arrow-left"/></svg><span id="nav-back-label" data-i18n="back">Back</span></button>
+    </div>
+    <div id="bar" class="lv-play-bar" hidden>
+      <span class="lv-me"><span id="me-avatar" class="se-me-avatar" aria-hidden="true"></span><span id="me-name" class="lv-me-name"></span>
+        <button type="button" id="btn-rename" class="lv-edit" data-i18n-aria="change_name" data-i18n-title="change_name"><svg class="ic" aria-hidden="true" focusable="false"><use href="/static/icons.svg#pencil"/></svg></button></span>
+      <button type="button" id="btn-rank" class="lv-rank-pill" aria-haspopup="dialog"></button>
+    </div>
+    </div>
+    <div id="sp-prog" class="hw-prog" hidden>
+      <span id="sp-prog-label" class="hw-prog-label"></span>
+      <div id="sp-prog-bar" class="hw-prog-track" role="progressbar" aria-valuemin="0" aria-labelledby="sp-prog-label"><span class="hw-prog-fill"></span></div>
+    </div>
+
+    <!-- 1. PIN -->
+    <section class="lv-screen lv-center" data-screen="pin" aria-labelledby="pin-title" hidden>
+      <form id="pin-form" class="lv-card lv-pin-card" novalidate>
+        <h1 id="pin-title" data-i18n="play_title">Join a game</h1>
+        <div class="lv-field">
+          <label for="pin" data-i18n="pin_label">Game PIN</label>
+          <input id="pin" class="lv-input lv-pin-input" inputmode="numeric" autocomplete="off" maxlength="6" pattern="[0-9]{6}"
+                 data-i18n-ph="pin_ph" aria-describedby="pin-err" required>
+          <p id="pin-err" class="lv-error" aria-live="polite"></p>
+        </div>
+        <button type="submit" class="lv-btn lv-btn-dark lv-btn-lg" data-i18n="join">Join</button>
+      </form>
+    </section>
+
+    <!-- 2. Nickname -->
+    <section class="lv-screen lv-center" data-screen="nick" aria-labelledby="nick-title" hidden>
+      <form id="nick-form" class="lv-card lv-pin-card" novalidate>
+        <p class="lv-pill" id="nick-pin" style="align-self:center"></p>
+        <h1 id="nick-title" data-i18n="nick_title">What is your name?</h1>
+        <div class="lv-field">
+          <label for="nick" data-i18n="nick_label">Nickname</label>
+          <input id="nick" class="lv-input" maxlength="20" autocomplete="nickname" data-i18n-ph="nick_ph" aria-describedby="nick-hint nick-err" required>
+          <p id="nick-hint" class="lv-hint" data-i18n="nick_hint">Up to 20 letters.</p>
+          <p id="nick-err" class="lv-error" aria-live="polite"></p>
+        </div>
+        <button type="submit" class="lv-btn lv-btn-primary lv-btn-lg" data-i18n="go">Let's go!</button>
+      </form>
+    </section>
+
+    <!-- 3. Waiting (lobby / between questions) -->
+    <section class="lv-screen lv-center" data-screen="wait" aria-labelledby="wait-title" hidden>
+      <div class="se-wait-art" aria-hidden="true"><span class="se-plate se-plate-lg"><img src="/static/brand/mascots/blue-512.webp" alt="" width="256" height="256"></span><span class="se-pulse"></span></div>
+      <h1 id="wait-title" class="lv-big"></h1>
+      <p id="wait-sub" class="lv-prompt" style="font-size:1.25rem"></p>
+    </section>
+
+    <!-- 3b. Homework intro / continue -->
+    <section class="lv-screen lv-center" data-screen="intro" aria-labelledby="in-title" hidden>
+      <div class="lv-card hw-intro">
+        <span class="se-plate se-plate-lg" aria-hidden="true"><img src="/static/brand/mascots/purple-512.webp" alt="" width="256" height="256"></span>
+        <span class="lv-tag" data-i18n="hw_eyebrow">Homework</span>
+        <h1 id="in-title" class="lv-big"></h1>
+        <p id="in-back" class="lv-prompt" style="font-size:1.2rem;margin:0" hidden></p>
+        <ul class="hw-facts">
+          <li><svg class="ic" aria-hidden="true" focusable="false"><use href="/static/icons.svg#book-open"/></svg><span id="in-count"></span></li>
+          <li><svg class="ic" aria-hidden="true" focusable="false"><use href="/static/icons.svg#calendar-clock"/></svg><span id="in-due"></span></li>
+          <li><svg class="ic" aria-hidden="true" focusable="false"><use href="/static/icons.svg#timer"/></svg><span data-i18n="hw_no_rush">No rush — each question has its own timer once you start it.</span></li>
+        </ul>
+        <p id="in-err" class="lv-error" role="alert"></p>
+        <button type="button" id="in-start" class="lv-btn lv-btn-primary lv-btn-lg"></button>
+      </div>
+    </section>
+
+    <!-- 3c. Homework paused -->
+    <section class="lv-screen lv-center" data-screen="paused" aria-labelledby="pa-title" hidden>
+      <div class="se-wait-art" aria-hidden="true"><span class="se-plate se-plate-lg"><img src="/static/brand/mascots/green-512.webp" alt="" width="256" height="256"></span><span class="se-pulse"></span></div>
+      <h1 id="pa-title" class="lv-big" data-i18n="hw_paused_title">Your teacher paused this game</h1>
+      <p class="lv-prompt" style="font-size:1.2rem" data-i18n="hw_paused_sub"></p>
+    </section>
+
+    <!-- 4. Question -->
+    <section class="lv-screen" data-screen="question" aria-labelledby="q-prompt" hidden>
+      <div class="lv-qmeta"><span id="q-count"></span><span id="q-timer" class="lv-timer" role="timer" aria-live="off"></span></div>
+      <h1 id="q-prompt" class="lv-prompt" lang="en"></h1>
+      <p id="q-help" class="lv-hint"></p>
+      <div id="q-answers"></div>
+      <p id="q-err" class="lv-error" role="alert"></p>
+    </section>
+
+    <!-- 5. Answer sent -->
+    <section class="lv-screen lv-center" data-screen="sent" aria-labelledby="sent-title" hidden>
+      <div class="lv-emoji-xl" aria-hidden="true"><svg class="ic" aria-hidden="true" focusable="false"><use href="/static/icons.svg#check"/></svg></div>
+      <h1 id="sent-title" class="lv-big" data-i18n="answer_sent">Answer sent!</h1>
+      <p class="lv-prompt" style="font-size:1.2rem" data-i18n="answer_wait"></p>
+    </section>
+
+    <!-- 6. Result -->
+    <section class="lv-screen" data-screen="result" aria-labelledby="res-title" hidden>
+      <div id="res-card" class="lv-result">
+        <div id="res-icon" class="lv-result-icon" aria-hidden="true"></div>
+        <h1 id="res-title" class="lv-big"></h1>
+        <div id="res-pts" class="lv-result-pts"></div>
+        <p id="res-streak" style="margin:0;font-weight:800"></p>
+      </div>
+      <div id="res-detail" class="lv-card"></div>
+      <p id="res-rank" class="lv-prompt" style="text-align:center;font-size:1.3rem"></p>
+      <p id="res-next" class="lv-hint" style="text-align:center"></p>
+      <div class="lv-row" style="justify-content:center"><button type="button" id="res-go" class="lv-btn lv-btn-primary lv-btn-lg" hidden></button></div>
+    </section>
+
+    <!-- 7. Final -->
+    <section class="lv-screen lv-center" data-screen="final" aria-labelledby="final-title" hidden>
+      <div class="lv-emoji-xl" id="final-emoji" aria-hidden="true">🏁</div>
+      <h1 id="final-title" class="lv-big" data-i18n="final_title">Game over!</h1>
+      <p id="final-rank" class="lv-prompt"></p>
+      <p id="final-score" class="lv-prompt" style="font-size:1.2rem"></p>
+      <p data-i18n="thanks" style="font-weight:800">Thanks for playing!</p>
+      <p id="final-sub" class="lv-hint" style="margin:0" hidden></p>
+      <a class="lv-btn lv-btn-dark" href="/play" id="final-again" data-i18n="play_again">Join another game</a>
+    </section>
+
+    <!-- 8. Kicked / gone -->
+    <section class="lv-screen lv-center" data-screen="gone" aria-labelledby="gone-title" hidden>
+      <h1 id="gone-title" class="lv-big"></h1>
+      <p id="gone-sub" class="lv-prompt" style="font-size:1.2rem"></p>
+      <a class="lv-btn lv-btn-dark" href="/play" data-i18n="play_again">Join another game</a>
+    </section>
+  </main>
+  <footer class="se-foot"><p>PlayClass 2026</p></footer>
+
+  <dialog id="dlg-rename" class="lv-dialog" aria-labelledby="rn-title">
+    <form id="rename-form" method="dialog" class="lv-screen" style="gap:12px" novalidate>
+      <h2 id="rn-title" data-i18n="rename_title">Change your name</h2>
+      <div class="lv-field">
+        <label for="rn-input" data-i18n="nick_label">Nickname</label>
+        <input id="rn-input" class="lv-input" maxlength="20" aria-describedby="rn-err" required>
+        <p id="rn-err" class="lv-error" aria-live="polite"></p>
+      </div>
+      <div class="lv-row lv-row-end">
+        <button type="button" class="lv-btn" id="rn-cancel" data-i18n="cancel">Cancel</button>
+        <button type="submit" class="lv-btn lv-btn-primary" value="save" data-i18n="save">Save</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="dlg-leave" class="lv-dialog" aria-labelledby="lv-title" aria-describedby="lv-sub">
+    <form method="dialog" class="lv-screen" style="gap:12px">
+      <h2 id="lv-title" data-i18n="leave_title">Leave the game?</h2>
+      <p id="lv-sub" class="lv-hint" style="margin:0" data-i18n="leave_sub">You can rejoin with the same PIN.</p>
+      <div class="lv-row lv-row-end">
+        <button type="submit" value="no" class="lv-btn" data-i18n="cancel">Cancel</button>
+        <button type="submit" value="yes" class="lv-btn lv-btn-danger" id="lv-yes" data-i18n="leave">Leave</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="dlg-lb" class="lv-dialog" aria-labelledby="lb-title">
+    <div class="lv-screen" style="gap:12px">
+      <h2 id="lb-title" data-i18n="lb_title">Live leaderboard</h2>
+      <p id="lb-gap" style="margin:0;font-weight:800"></p>
+      <ol id="lb-list" class="lv-lb-list"></ol>
+      <div class="lv-row lv-row-end"><button type="button" class="lv-btn lv-btn-dark" id="lb-close" data-i18n="close">Close</button></div>
+    </div>
+  </dialog>
+
+  <div id="lv-toast" class="lv-toast" role="status" hidden></div>
+  <div id="lv-announcer" class="sr-only" aria-live="polite"></div>
+</body>
+</html>

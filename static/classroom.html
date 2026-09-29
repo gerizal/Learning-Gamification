@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="light">
+  <title>PlayClass · One screen</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎯</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@500;600;700;800&display=swap">
+  <link rel="stylesheet" href="/static/theme-se.css">
+  <link rel="stylesheet" href="/static/classroom.css">
+  <script>
+    // Language before paint. The page is light theme only (data-theme="light" above).
+    try {
+      var l = localStorage.getItem('classroom.lang');
+      if (l === 'ms' || l === 'id') document.documentElement.lang = l;
+    } catch (e) {}
+  </script>
+  <script type="module" src="/static/classroom.js"></script>
+</head>
+<body class="theme-console cr">
+  <a class="skip-link btn btn-primary btn-sm" href="#main" data-i18n="skip_to_content">Skip to content</a>
+
+  <header class="cr-top" id="cr-top">
+    <div class="cr-top-inner">
+      <div class="topbar-title"><a href="/" class="se-home" aria-label="PlayClass — home"><span class="se-wordmark">Play<b>Class</b></span></a> <span class="cr-brand-sub" data-i18n="brand_sub">One screen · Teams</span></div>
+      <div class="grow"><span id="top-progress" class="top-progress stage-only" aria-hidden="true"></span></div>
+      <button type="button" class="btn btn-ghost btn-sm stage-only" id="stage-tips-toggle" aria-controls="gm-tips" aria-keyshortcuts="T"></button>
+      <button type="button" class="btn btn-ghost btn-sm stage-only" id="stage-end" data-icon="flag" data-i18n="end_game">End game</button>
+      <div class="lang-switch" role="group" aria-label="Language" data-i18n-aria="lang_label">
+        <button type="button" class="lang-btn" data-lang="en" aria-pressed="true" lang="en">EN</button>
+        <button type="button" class="lang-btn" data-lang="ms" aria-pressed="false" lang="ms">BM</button>
+        <button type="button" class="lang-btn" data-lang="id" aria-pressed="false" lang="id">ID</button>
+      </div>
+      <button type="button" id="btn-mute" class="btn btn-ghost btn-icon" aria-pressed="false"><svg class="ic" aria-hidden="true" focusable="false"><use href="/static/icons.svg#volume-2"/></svg></button>
+      <button type="button" id="btn-keys" class="btn btn-ghost btn-icon cr-q" aria-keyshortcuts="Shift+/" data-i18n-aria="shortcuts" data-i18n-title="shortcuts"><svg class="ic" aria-hidden="true" focusable="false"><use href="/static/icons.svg#keyboard"/></svg></button>
+      <button type="button" id="btn-fs" class="btn btn-ghost btn-icon" aria-keyshortcuts="F" data-i18n-aria="fullscreen" data-i18n-title="fullscreen"><svg class="ic" aria-hidden="true" focusable="false"><use href="/static/icons.svg#maximize"/></svg></button>
+    </div>
+  </header>
+
+  <main id="main" tabindex="-1">
+    <div id="health-banner" class="banner banner-warning cr-banner" role="status" hidden></div>
+
+    <!-- ============ 1. SETUP (one screen) ============ -->
+    <section id="scr-setup" class="screen cr-page" aria-labelledby="setup-title" hidden>
+      <div id="resume-banner" class="banner cr-resume" hidden></div>
+      <div class="se-backbar"><a class="btn btn-sm se-back" id="setup-back" href="/" data-icon="arrow-left" data-i18n="back_home">Back to home</a></div>
+      <div class="grouping-row">
+        <span class="grouping-label" id="grouping-label" data-i18n="grouping_label">Students play as</span>
+        <div id="grouping-switch" class="seg" role="radiogroup" aria-labelledby="grouping-label">
+          <button type="button" role="radio" class="seg-btn" data-grouping="individual" aria-checked="false" data-icon="user" data-i18n="grouping_individual">Individuals</button>
+          <button type="button" role="radio" class="seg-btn" data-grouping="teams" aria-checked="true" data-icon="users" data-i18n="grouping_teams">Groups</button>
+        </div>
+      </div>
+      <div class="cr-page-head">
+        <h1 id="setup-title" data-i18n="setup_title">Team quiz on one screen</h1>
+        <div class="field saved-class" id="saved-class-wrap" hidden>
+          <label for="saved-class" data-i18n="saved_class">Use a saved class</label>
+          <select id="saved-class"></select>
+        </div>
+      </div>
+      <div class="tips-slot tips-inline"></div>
+      <section id="cr-school-card" class="card se-school" aria-labelledby="cr-school-title">
+        <div class="se-school-head">
+          <h2 id="cr-school-title" class="se-card-label" data-i18n="your_school">Your school</h2>
+          <button type="button" id="cr-school-change" class="se-linkbtn" aria-controls="cr-school-fields" aria-expanded="false" hidden data-i18n="change">Change</button>
+        </div>
+        <p id="cr-school-summary" class="se-school-summary" hidden></p>
+        <div id="cr-school-fields" class="se-school-fields">
+          <div class="field">
+            <label for="cr-school"><span data-i18n="school">School</span> <span class="se-req" aria-hidden="true">*</span></label>
+            <input id="cr-school" maxlength="200" list="dl-cr-schools" autocomplete="organization" required data-i18n-ph="school_ph" aria-describedby="cr-school-err">
+            <datalist id="dl-cr-schools"></datalist>
+            <span class="error" id="cr-school-err" aria-live="polite"></span>
+          </div>
+        </div>
+        <p class="small muted se-school-note" id="cr-school-note" data-i18n="school_saved">Saved on this device.</p>
+      </section>
+      <div class="setup-grid">
+        <div class="card stack">
+          <h2 id="pack-title" data-i18n="pick_pack">1 · Pick a quiz pack</h2>
+          <div id="pack-list" class="pack-list" role="radiogroup" aria-labelledby="pack-title"></div>
+        </div>
+        <div class="stack">
+          <div class="card stack">
+            <div class="field">
+              <label for="paste-names" class="h2like" data-i18n="paste_label">2 · Paste student names, one per line</label>
+              <textarea id="paste-names" rows="8" data-i18n-ph="paste_ph" placeholder="Aisyah&#10;Arjun&#10;Mei Ling" aria-describedby="names-count"></textarea>
+              <span class="hint" id="names-count" aria-live="polite"></span>
+            </div>
+            <details id="absent-box" class="absent-box">
+              <summary class="btn btn-sm" id="absent-summary" data-i18n="whos_absent">Who’s absent? (optional)</summary>
+              <p class="small muted" data-i18n="attend_hint">Tap a name to mark absent. Tap again to mark present.</p>
+              <div id="attend-list" class="attend-list" role="group" aria-labelledby="absent-summary"></div>
+            </details>
+          </div>
+          <div class="card stack" id="qc-card" hidden>
+            <h2 id="qc-label" data-i18n="q_how_many">3 · Number of questions</h2>
+            <div id="qc-group" class="seg seg-lg" role="radiogroup" aria-labelledby="qc-label"></div>
+            <p id="qc-summary" class="size-summary"></p>
+            <div id="qc-advice" class="banner" hidden></div>
+          </div>
+          <div class="card stack" id="size-card">
+            <h2 data-i18n="game_size">3 · Teams &amp; rounds</h2>
+            <div class="stepper-field">
+              <span class="field-label" id="tc-label" data-i18n="team_count">Teams</span>
+              <div id="team-preview" class="team-preview" aria-hidden="true"></div>
+              <div class="stepper" role="group" aria-labelledby="tc-label">
+                <button type="button" class="btn btn-icon" id="tc-minus" data-i18n-aria="fewer">−</button>
+                <output id="tc-val" class="stepper-val" aria-live="polite">4</output>
+                <button type="button" class="btn btn-icon" id="tc-plus" data-i18n-aria="more">＋</button>
+              </div>
+            </div>
+            <div class="stepper-field">
+              <span class="field-label" id="rd-label" data-i18n="rounds">Rounds</span>
+              <div class="stepper" role="group" aria-labelledby="rd-label">
+                <button type="button" class="btn btn-icon" id="rd-minus" data-i18n-aria="fewer">−</button>
+                <output id="rd-val" class="stepper-val" aria-live="polite">3</output>
+                <button type="button" class="btn btn-icon" id="rd-plus" data-i18n-aria="more">＋</button>
+              </div>
+            </div>
+            <p id="size-summary" class="size-summary"></p>
+            <div id="size-advice" class="banner" hidden></div>
+          </div>
+        </div>
+      </div>
+      <div class="wizard-foot">
+        <p id="wz-hint" class="small muted grow" role="status"></p>
+        <button type="button" class="btn btn-primary btn-xl" id="wz-next" data-icon="users" data-i18n="start_game">Make teams</button>
+      </div>
+    </section>
+
+    <!-- ============ LOBBY ============ -->
+    <section id="scr-lobby" class="screen cr-page" aria-labelledby="lobby-title" hidden>
+      <div class="cr-page-head">
+        <h1 id="lobby-title" data-i18n="lobby_title">Meet the teams!</h1>
+        <p id="lobby-sub" class="muted" style="margin:0"></p>
+      </div>
+      <div class="lobby-layout">
+        <div>
+          <p id="lobby-move-hint" class="small muted" role="status" data-i18n="lobby_hint">To move a student: tap their name, then tap "Move here" on another team.</p>
+          <div id="lobby-teams" class="lobby-teams"></div>
+        </div>
+        <div class="tips-slot"></div>
+      </div>
+      <div class="wizard-foot">
+        <button type="button" class="btn btn-lg" id="lobby-back" data-icon="arrow-left" data-i18n="back_setup">Setup</button>
+        <button type="button" class="btn btn-lg" id="lobby-shuffle" data-icon="shuffle" data-i18n="shuffle">Shuffle teams</button>
+        <div class="add-slot"></div>
+        <div class="grow"></div>
+        <button type="button" class="btn btn-primary btn-xl" id="lobby-start" data-icon="play" data-i18n="start_big">START</button>
+      </div>
+    </section>
+
+    <!-- ============ READY (individuals: no teams, no shuffle) ============ -->
+    <section id="scr-ready" class="screen cr-page" aria-labelledby="ready-title" hidden>
+      <div class="cr-page-head">
+        <h1 id="ready-title" data-i18n="ready_title">Ready to play!</h1>
+        <p id="ready-sub" class="muted" style="margin:0"></p>
+      </div>
+      <div class="lobby-layout">
+        <section class="card stack" aria-labelledby="ready-list-title">
+          <div class="ready-head">
+            <h2 id="ready-list-title"></h2>
+            <div class="add-slot"></div>
+          </div>
+          <ul id="ready-list" class="ready-list"></ul>
+        </section>
+        <div class="tips-slot"></div>
+      </div>
+      <div class="wizard-foot">
+        <button type="button" class="btn btn-lg" id="ready-back" data-icon="arrow-left" data-i18n="back_setup">Setup</button>
+        <div class="grow"></div>
+        <button type="button" class="btn btn-primary btn-xl" id="ready-start" data-icon="play" data-i18n="start_big">START</button>
+      </div>
+    </section>
+
+    <!-- ============ 2. STAGE ============ -->
+    <section id="scr-stage" class="screen stage" aria-labelledby="stage-title" hidden>
+      <h1 id="stage-title" class="sr-only"></h1>
+      <ol id="scoreboard" class="scoreboard" aria-label="Scoreboard" data-i18n-aria="scoreboard"></ol>
+      <div class="stage-main">
+        <div class="turn-panel">
+          <div id="turn-banner" class="turn-banner"></div>
+          <div id="speaker-picker" class="speaker-picker" role="radiogroup" aria-labelledby="speaker-label"></div>
+          <div id="who-picker" class="who-picker" hidden>
+            <span class="picker-label" id="who-label"><span data-i18n="who_answering">Who’s answering?</span> <span class="kbd" aria-hidden="true">C</span></span>
+            <div class="who-search">
+              <label for="who-search" class="sr-only" data-i18n="who_search_label">Find a student by name</label>
+              <input id="who-search" type="search" autocomplete="off" spellcheck="false" data-i18n-ph="who_search_ph" placeholder="Type a name…" aria-controls="who-list" aria-describedby="who-count">
+              <span id="who-count" class="sr-only" aria-live="polite"></span>
+            </div>
+            <div id="who-list" class="who-list" role="radiogroup" aria-labelledby="who-label"></div>
+          </div>
+          <div id="q-stage" class="q-stage"></div>
+          <div id="result-stage" class="result-stage" hidden></div>
+        </div>
+        <div class="control-panel" id="control-panel">
+          <div class="timer-wrap" id="timer-wrap">
+            <svg class="timer-ring" viewBox="0 0 184 184" aria-hidden="true">
+              <circle class="ring-bg" cx="92" cy="92" r="86"></circle>
+              <circle class="ring-fg" id="ring-fg" cx="92" cy="92" r="86"></circle>
+            </svg>
+            <span class="timer-text" id="timer-text" role="timer" aria-live="off">0:20</span>
+          </div>
+          <button type="button" class="btn btn-sm" id="btn-pause" aria-pressed="false" aria-keyshortcuts="P"></button>
+          <div id="rec-status" class="rec-status center" aria-live="polite"></div>
+          <div class="control-actions">
+            <button type="button" class="btn btn-lg btn-skip" id="btn-skip" aria-keyshortcuts="S" hidden></button>
+            <button type="button" class="btn btn-primary btn-lg" id="btn-next" aria-keyshortcuts="ArrowRight Enter" hidden></button>
+          </div>
+          <div class="add-slot add-slot-teams"></div>
+        </div>
+        <section id="lb-panel" class="lb-panel" aria-labelledby="lb-title" hidden>
+          <div class="lb-head">
+            <h2 id="lb-title" data-icon="trophy" data-i18n="leaderboard">Leaderboard</h2>
+            <div class="add-slot add-slot-ind"></div>
+          </div>
+          <ol id="lb-list" class="lb-list"></ol>
+          <p id="lb-more" class="lb-more" hidden></p>
+        </section>
+        <div class="tips-slot stage-tips-slot"></div>
+      </div>
+    </section>
+
+    <!-- ============ 3. FINALE ============ -->
+    <section id="scr-finale" class="screen cr-page finale" aria-labelledby="finale-title" hidden>
+      <h1 id="finale-title" class="stage-title center" data-i18n="finale_title">GAME OVER!</h1>
+      <div class="finale-grid">
+        <div class="stack">
+          <div id="podium" class="podium"></div>
+          <div id="mvp" class="mvp card" hidden></div>
+          <div id="rank-card" class="card stack rank-card" hidden>
+            <h2 id="rank-title" data-i18n="full_ranking">Full ranking</h2>
+            <div class="rank-wrap" tabindex="0" role="region" aria-labelledby="rank-title"><ol id="rank-list" class="rank-list"></ol></div>
+          </div>
+          <div class="tips-slot"></div>
+        </div>
+        <div class="card stack participation" aria-labelledby="part-title">
+          <h2 id="part-title" data-i18n="participation">Participation</h2>
+          <p id="part-summary" class="part-summary"></p>
+          <div id="part-bar" class="part-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100"><i></i></div>
+          <div class="table-wrap part-table-wrap" tabindex="0" role="region" aria-labelledby="part-title"><table class="table" id="part-table"></table></div>
+        </div>
+      </div>
+      <div class="wizard-foot">
+        <a class="btn btn-lg" id="btn-csv" href="#" download data-icon="download" data-i18n="download_csv">Download CSV</a>
+        <a class="btn btn-lg" href="/reports" data-icon="chart-column" data-i18n="nav_reports">View all reports</a>
+        <div class="grow"></div>
+        <button type="button" class="btn btn-lg" id="btn-new-game" data-i18n="new_game">New setup</button>
+        <button type="button" class="btn btn-primary btn-lg" id="btn-again" data-icon="rotate-ccw" data-i18n="play_again">Play again with same class</button>
+      </div>
+    </section>
+
+    <section id="scr-loading" class="screen" hidden>
+      <div class="empty"><span class="spinner spinner-lg" aria-hidden="true"></span><p data-i18n="loading">Loading…</p></div>
+    </section>
+  </main>
+  <footer class="se-foot"><p>PlayClass 2026</p></footer>
+
+  <!-- Game master tips (moved into the active screen's .tips-slot) -->
+  <aside id="gm-tips" class="gm-tips" aria-labelledby="gm-tips-title">
+    <div class="gm-tips-head">
+      <h2 id="gm-tips-title" data-icon="lightbulb" data-i18n="gm_tips">Game master tips</h2>
+      <button type="button" class="btn btn-ghost btn-sm" id="gm-tips-collapse" aria-expanded="true" aria-controls="gm-tips-body"></button>
+    </div>
+    <div id="gm-tips-body" class="gm-tips-body"></div>
+  </aside>
+
+  <!-- "+ Add student" (late arrivals; moved into the active screen's .add-slot) -->
+  <div id="add-stu" class="add-stu" hidden>
+    <button type="button" class="btn btn-sm add-stu-btn" id="add-stu-btn" aria-expanded="false" aria-controls="add-stu-form" data-icon="plus" data-i18n="add_student">Add student</button>
+    <form id="add-stu-form" class="add-stu-form" hidden>
+      <label for="add-stu-name" class="sr-only" data-i18n="add_student_label">Name of the student who just arrived</label>
+      <input id="add-stu-name" maxlength="100" autocomplete="off" spellcheck="false" required data-i18n-ph="add_student_ph" placeholder="Name">
+      <button type="submit" class="btn btn-primary btn-sm" id="add-stu-save" data-i18n="add">Add</button>
+      <button type="button" class="btn btn-ghost btn-sm" id="add-stu-cancel" data-i18n="move_cancel">Cancel</button>
+    </form>
+  </div>
+
+  <!-- Keyboard shortcuts -->
+  <dialog id="keys-dlg" class="howto keys-dlg" aria-labelledby="keys-title">
+    <div class="howto-inner">
+      <h2 id="keys-title" data-i18n="shortcuts">Keyboard shortcuts</h2>
+      <dl id="keys-list" class="keys-list"></dl>
+      <button type="button" class="btn btn-primary" id="keys-close" data-i18n="close">Close</button>
+    </div>
+  </dialog>
+
+  <canvas id="fx-canvas" aria-hidden="true"></canvas>
+  <div id="announcer" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+  <div id="toasts" class="toast-region" aria-live="assertive" aria-atomic="false"></div>
+  <noscript><div class="container"><div class="banner banner-danger">This page needs JavaScript.</div></div></noscript>
+</body>
+</html>

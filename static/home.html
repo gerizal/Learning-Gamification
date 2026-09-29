@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="light">
+  <title>PlayClass</title>
+  <meta name="description" content="Classroom Learning Game — teachers host a quiz, students join with a PIN.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎲</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700;800&display=swap">
+  <link rel="stylesheet" href="/static/theme-se.css">
+  <link rel="stylesheet" href="/static/live.css">
+  <script>
+    // A shared "?pin=123456" link goes straight to the student join page.
+    (function () { var m = /[?&]pin=(\d{6})\b/.exec(location.search); if (m) location.replace('/play?pin=' + m[1]); })();
+  </script>
+  <script type="module">
+    import { applyI18n, mountLangSwitch, BRAND } from '/static/i18n.js';
+    import { applyPrefs } from '/static/a11y-prefs.js';
+    applyPrefs();
+    applyI18n();
+    document.title = BRAND.name;
+    mountLangSwitch(document.getElementById('lang'));
+    try { const m = document.createElement('meta'); m.name = 'theme-color'; m.content = getComputedStyle(document.documentElement).getPropertyValue('--se-bg').trim(); document.head.append(m); } catch (e) { /* ignore */ }
+  </script>
+</head>
+<body class="lv">
+  <header class="lv-top">
+    <span class="lv-brand"><span class="se-wordmark">Play<b>Class</b></span></span>
+    <span class="lv-grow"></span>
+    <div id="lang" class="lv-lang"></div>
+  </header>
+  <main id="main" class="lv-main">
+    <section class="lv-screen lv-home" aria-labelledby="home-title">
+      <h1 id="home-title" data-i18n="home_title">Ready to play?</h1>
+      <nav class="lv-gate" aria-label="PlayClass">
+        <a class="lv-gate-btn lv-gate-teacher" href="/host">
+          <span class="se-plate se-plate-md"><img src="/static/brand/mascots/purple-256.webp" alt="" width="256" height="256"></span>
+          <span class="lv-txt"><span data-i18n="teacher">I'm a Teacher</span><small data-i18n="teacher_sub">Host a game on the big screen</small></span>
+        </a>
+        <a class="lv-gate-btn lv-gate-student" href="/play">
+          <span class="se-plate se-plate-md"><img src="/static/brand/mascots/pink-256.webp" alt="" width="256" height="256"></span>
+          <span class="lv-txt"><span data-i18n="student">I'm a Student</span><small data-i18n="student_sub">Join with a game PIN</small></span>
+        </a>
+      </nav>
+    </section>
+  </main>
+  <footer class="se-foot"><p>PlayClass 2026</p></footer>
+</body>
+</html>

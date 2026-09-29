@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en" class="rp-root">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="light">
+  <meta name="robots" content="noindex">
+  <title>Program reports · PlayClass</title>
+  <meta name="description" content="PlayClass program reports — schools, classes and students across live, homework and one-screen games.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700;800&display=swap">
+  <link rel="stylesheet" href="/static/theme-se.css">
+  <link rel="stylesheet" href="/static/reports.css">
+  <script type="module" src="/static/reports.js"></script>
+</head>
+<body class="rp">
+  <a class="rp-skip" href="#main" data-i18n="rp_skip">Skip to content</a>
+  <header class="rp-top">
+    <a class="rp-brand" href="/"><span class="rp-wordmark">Play<b>Class</b></span></a>
+    <span class="rp-brand-sub" data-i18n="rp_title">Program reports</span>
+    <span class="rp-grow"></span>
+    <div id="lang" class="rp-lang"></div>
+    <button type="button" id="signout" class="rp-btn rp-btn-ghost" hidden data-i18n="rp_sign_out">Sign out</button>
+  </header>
+
+  <main id="main" class="rp-main" tabindex="-1">
+    <!-- Access gate -->
+    <section id="gate" class="rp-gate rp-card" aria-labelledby="gate-title">
+      <p class="rp-label" data-i18n="rp_program_overview">All schools</p>
+      <h1 id="gate-title" data-i18n="rp_gate_title">Program reports</h1>
+      <p class="rp-muted" data-i18n="rp_gate_sub">For the program team. Enter the reports access code.</p>
+      <form id="gate-form" novalidate>
+        <label for="code" class="rp-field-label" data-i18n="rp_code">Reports access code</label>
+        <input id="code" name="code" type="password" autocomplete="current-password" required
+               aria-describedby="gate-err" spellcheck="false">
+        <p id="gate-err" class="rp-err" role="alert"></p>
+        <button type="submit" class="rp-btn rp-btn-primary" data-i18n="rp_open">Open reports</button>
+      </form>
+    </section>
+
+    <!-- Reports app -->
+    <div id="app" hidden>
+      <div class="rp-backbar" id="backbar" hidden>
+        <button type="button" id="nav-back" class="rp-btn rp-btn-ghost rp-btn-sm rp-back"><svg class="ic" aria-hidden="true" focusable="false"><use href="/static/icons.svg#arrow-left"/></svg><span data-i18n="back">Back</span></button>
+      </div>
+      <nav class="rp-crumbs" id="crumbs" data-i18n-aria="rp_breadcrumb" aria-label="Breadcrumb"></nav>
+
+      <form id="filters" class="rp-filters rp-card" data-i18n-aria="rp_filters" aria-label="Filters">
+        <div class="rp-f">
+          <label for="f-mode" data-i18n="rp_mode">Game type</label>
+          <select id="f-mode">
+            <option value="" data-i18n="rp_all_modes">All types</option>
+            <option value="live" data-i18n="rp_mode_live">Live (PIN)</option>
+            <option value="homework" data-i18n="rp_mode_homework">Homework</option>
+            <option value="one-screen" data-i18n="rp_mode_one">One-screen (teams)</option>
+          </select>
+        </div>
+        <div class="rp-f rp-f-grow">
+          <label for="f-school" data-i18n="rp_school_search">School</label>
+          <input id="f-school" type="search" data-i18n-ph="rp_school_ph" placeholder="Search schools" autocomplete="off">
+        </div>
+        <div class="rp-f">
+          <label for="f-from" data-i18n="rp_from">From</label>
+          <input id="f-from" type="date">
+        </div>
+        <div class="rp-f">
+          <label for="f-to" data-i18n="rp_to">To</label>
+          <input id="f-to" type="date">
+        </div>
+        <div class="rp-f rp-f-actions">
+          <button type="submit" class="rp-btn rp-btn-primary" data-i18n="rp_apply">Apply</button>
+          <button type="button" id="f-reset" class="rp-btn rp-btn-ghost" data-i18n="rp_reset">Reset</button>
+        </div>
+      </form>
+
+      <p id="status" class="rp-status" role="status" aria-live="polite"></p>
+      <div id="view"></div>
+    </div>
+  </main>
+
+  <footer class="rp-footer"><span data-i18n="rp_footer">PlayClass 2026</span></footer>
+</body>
+</html>
